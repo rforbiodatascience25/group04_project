@@ -1,0 +1,126 @@
+---
+title: "Dataprocessing"
+format: html
+---
+
+### Load the libraries
+
+```{r}
+#| message = FALSE
+library(tidyverse)
+library(hgu133a.db)
+library(AnnotationDbi)
+library(dplyr)
+```
+
+### Load the data
+
+```{r Load the data}
+# Define the URL of the file
+target_url <- "https://raw.githubusercontent.com/ramhiser/datamicroarray/master/data/borovecki.RData"
+output_file <- "~/projects/group04_project/data/borovecki.RData"
+
+# Download the file
+curl::curl_download(url = target_url, destfile = output_file)
+
+load("~/projects/group04_project/data/borovecki.RData") 
+```
+
+### Pre-processing of the data
+
+Borovecki is a microarray data set that contains gene expression information of 31 patients. It is composed of 2 lists:
+
+-   x: Contains the probes IDs and the gene expression values of each sample
+
+-   y: Contains the label of each sample (symptomatic, control)
+
+The desired output is a tibble with tidy data:
+
+1.  Each row is an observation
+2.  Each column is a variable
+3.  Each cell is a single value
+
+To obtain so, we will use the library tidyverse to wrangle the data. First, we will first integrate the two lists into a jointed tibble.
+
+```{r Obtain a jointed tibble}
+borovecki <- borovecki$x |>
+  as_tibble() |>
+  mutate(
+    sample = row_number(), 
+    .before = 1, 
+    diagnosis = borovecki$y
+  )
+```
+
+We will now pivot the columns to obtain a variable called `probeID` accompanied by another called `expressionValue`, together they will summarize the data of the original tibble but in a tidy format
+
+```{r Pivoting of the tibble}
+borovecki <- borovecki |>
+  pivot_longer(
+    cols = ends_with("at"),
+    names_to = "probeID", 
+    values_to = "expressionValue",
+    values_drop_na = TRUE
+  )
+```
+
+The information is given for the probe IDs, 25-nucleotide sequences that correspond to genes. It is of interest to convert this information to information per gene. In the original paper we can find "Microarray analysis was performed by using U133A GeneChips (Affymetrix) and CodeLink Uniset Human I and II bioarrays (Amersham Biosciences)":
+
+-   The function `mapIds()`: I knew I had to use an annotation library. AI was used to obtain this information, ChatGPT indicated that AnnotationDbi and mapIds() is commonly used in these cases. However, the code was **NOT** obtained with AI but we did it ourselves after consulting the ["Manual AnnotationDbi: Introduction To Bioconductor Annotation Packages (March Carlson 2025)"](https://bioconductor.org/packages/devel/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf)
+
+```{r Annotation process}
+#| message = FALSE
+borovecki <- borovecki |>
+  mutate(
+    gene = mapIds(
+      hgu133a.db, 
+      keys=probeID, 
+      keytype = "PROBEID", 
+      column="SYMBOL",
+      multiVals="first"
+    )
+  ) |>
+  filter(!is.na(gene)) |>
+  # I specify the package because AnnotationDbi also has a select function
+  dplyr::select(-probeID)
+```
+
+A common occurrence in microarrays is that several probes map to the same gene. The standard processing is to average the expression per gene and sample:
+
+-   I specify `.groups="drop"` to collapse the multiple rows for the same sample and gene into a unique one
+
+```{r}
+library(data.table)
+library(tibble)
+
+# 1. Convertir tibble a data.table
+borovecki_dt <- as.data.table(borovecki)
+
+# 2. Convertir 'expression' desde tipo "special" a numeric real
+# (esta vía funciona incluso con integer64 u otros tipos especiales)
+borovecki_dt[, expression := as.numeric(as.character(expression))]
+
+# 3. Agrupación rápida en data.table
+borovecki_dt <- borovecki_dt[
+  , .(expression = mean(expression, na.rm = TRUE)),
+  by = .(sample, gene)
+]
+
+# 4. Volver a tibble si quieres
+borovecki <- as_tibble(borovecki_dt)
+
+
+```
+
+```{r Averaging the expression values per gene and sample}
+borovecki <- borovecki |>
+  group_by(sample, gene) |>
+  summarise(expression = mean(expression), .groups = "drop")
+
+```
+
+The last chunk of code has taken a long time to run, so in order to access the tibble we created without having to run the code every time, we're going to save it in the data folder
+
+```{r Save the tidy tibble data}
+saveRDS(borovecki, file = "~/projects/group04_project/data/borovecki_tibble.rds")
+```

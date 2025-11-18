@@ -3,6 +3,7 @@ title: "Data processing"
 format: html
 ---
 
+
 ### Load the libraries
 
 ### s253699
@@ -49,3 +50,97 @@ filter(gene == "ZDHHC17"), aes(diagnosis, expressionValue, fill = diagnosis)) +
 ```
 
 For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
+### Load libraries and data
+
+```{r, echo=FALSE}
+library("tidyverse")
+library("fs")
+library("patchwork")
+
+borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/projects/groupal_project/data/borovecki_tibble.rds")
+```
+
+### Data overview and inspections
+
+We load the data to get an overview
+
+```{r}
+borovecki_data
+```
+
+### Classification according to expression level
+
+First, we normalize the data by doing the log2 of expression values.
+
+```{r}
+borovecki_data <- borovecki_data |> 
+  mutate(log2_expression = log2(expressionValue))
+```
+
+We need to know the max and min expression level values. As this is microRNA data, we will not get negative values, since we are measuring expression levels. If value is 0, it means there is no expression at all.
+
+```{r}
+borovecki_data |>
+  summarise(min_exp = min(log2_expression),
+            max_exp = max(log2_expression))
+```
+
+```{r}
+ggplot(borovecki_data, aes(x=diagnosis, y=log2_expression)) +
+  geom_boxplot()
+```
+
+In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from 0.1 to 71,782.18, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest ("Very High").
+
+```{r}
+borovecki_grouped <- borovecki_data |> 
+  mutate(expressionClass = case_when(log2_expression < 11963.78 ~ "Very Low",
+    11963.78 <= log2_expression & log2_expression < 23927.46 ~ "Low",
+    23927.46 <= log2_expression & log2_expression < 35891.14 ~ "Moderate Low",
+    35891.14 <= log2_expression & log2_expression < 47854.82 ~ "Moderate High",
+    47854.82 <= log2_expression & log2_expression < 59818.50 ~ "High",
+    59818.50 <= log2_expression ~ "Very High"))
+
+borovecki_grouped |> 
+  select(log2_expression, expressionClass)
+
+```
+
+We want to plot the different groups, to have an idea of the distribution in the data.
+
+```{r}
+borovecki_grouped |>
+count(expressionClass) |>
+  
+# Visualization
+ggplot(aes(x = expressionClass,
+           y = n,
+           fill = expressionClass)) +
+  geom_col(colour = "green",
+           fill = "lightgreen",
+           alpha = 0.5) +
+  theme_minimal(base_size = 16) +
+  theme(axis.text.x = element_text(
+        angle = 45,
+        hjust = 1)) +
+  labs(x = "Expression level group",
+       y = "Number of genes",
+       title = "Gene counts per expression category") +
+  theme(legend.position = "none")
+```
+
+After grouping the expression values into six categories, we observed that most genes fall into the lower expression groups, while the uppermost group contains very few genes. This strongly suggests that the maximum value, 71,782.18, is likely an outlier.
+
+In typical gene expression datasets, values usually show a right-skewed distribution, where a small number of genes have extremely high expression levels. The fact that almost all data points are concentrated in the first categories, and only a tiny fraction reaches the highest levels, supports the idea that the extreme value is not representative of the general expression distribution.
+
+Specifically, we will see how many genes are in each expression level group.
+
+```{r}
+# Get total count in each expression group and percent.
+borovecki_grouped |> 
+  count(expressionClass) |> 
+  mutate(percent = round(100 * n / sum(n), 2))
+
+print(expression_counts)
+```
+

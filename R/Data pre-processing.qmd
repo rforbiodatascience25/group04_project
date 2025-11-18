@@ -1,5 +1,5 @@
 ---
-title: "Dataprocessing"
+title: "Data pre-processing"
 format: html
 ---
 
@@ -89,31 +89,8 @@ A common occurrence in microarrays is that several probes map to the same gene. 
 
 -   I specify `.groups="drop"` to collapse the multiple rows for the same sample and gene into a unique one
 
-```{r}
-library(data.table)
-library(tibble)
-
-# 1. Convertir tibble a data.table
-borovecki_dt <- as.data.table(borovecki)
-
-# 2. Convertir 'expression' desde tipo "special" a numeric real
-# (esta vía funciona incluso con integer64 u otros tipos especiales)
-borovecki_dt[, expression := as.numeric(as.character(expression))]
-
-# 3. Agrupación rápida en data.table
-borovecki_dt <- borovecki_dt[
-  , .(expression = mean(expression, na.rm = TRUE)),
-  by = .(sample, gene)
-]
-
-# 4. Volver a tibble si quieres
-borovecki <- as_tibble(borovecki_dt)
-
-
-```
-
 ```{r Averaging the expression values per gene and sample}
-borovecki <- borovecki |>
+borovecki_geneLevel <- borovecki |>
   group_by(sample, gene) |>
   summarise(expression = mean(expression), .groups = "drop")
 
@@ -122,5 +99,5 @@ borovecki <- borovecki |>
 The last chunk of code has taken a long time to run, so in order to access the tibble we created without having to run the code every time, we're going to save it in the data folder
 
 ```{r Save the tidy tibble data}
-saveRDS(borovecki, file = "~/projects/group04_project/data/borovecki_tibble.rds")
+saveRDS(borovecki_geneLevel, file = "~/projects/group04_project/data/borovecki_tibble.rds")
 ```

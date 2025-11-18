@@ -13,7 +13,7 @@ library("patchwork")
 borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/projects/groupal_project/data/borovecki_tibble.rds")
 ```
 
-### Data overview and inspection
+### Data overview and inspections
 
 We load the data to get an overview
 

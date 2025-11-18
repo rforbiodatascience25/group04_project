@@ -9,19 +9,11 @@ editor: visual
 ## Load libraries
 
 ```{r}
-library(tidyverse)
-library(modelr)
-library(splines)
-library(readr)
-library(dplyr)
-library(purrr)
-library(broom)
-library(forcats)
-library(ggrepel)
-library(hgu133plus2.db)
-library(AnnotationDbi)
-library(dplyr)
-library(tibble)
+library(tidyverse)  
+library(modelr)     
+library(splines)   
+library(broom)      
+library(ggrepel)  
 ```
 
 ## Load Data
@@ -33,45 +25,54 @@ borovecki_tibble <- readRDS("~/projects/group04_project/data/borovecki_tibble.rd
 
 ## Clean Data
 
-To apply funcitonal modeling
+The `lm()` function uses a wide-data format where:
+
+-   Each column is a gene
+
+-   Each row is a sample denoted with its diagnosis: `0 = healthy`, `1 = disease`
+
+-   Each cell contains the log2(expressionValue)
 
 ```{r}
 borovecki_tibble <- borovecki_tibble |>
   pivot_wider(
+    # Columns not to pivot
     id_cols = c(sample, diagnosis),
+    
+    # Columns to pivot
     names_from = gene,
     values_from = expressionValue
   ) |>
+  
+  # Create a new binary column that stores the clinical condition
   mutate(
     Diagnosis = case_when(
       diagnosis == "symptomatic" ~ 1,
       diagnosis == "control" ~ 0
     )
   ) |>
-  dplyr::select(-diagnosis) |>
-  dplyr::select(-sample) |>
+  dplyr::select(-c(diagnosis,sample)) |>
   relocate(Diagnosis, .before = 1)
 ```
 
-## Analysis
+## Individual Analysis
 
-**T7: Use the `lm()` function to create your first model and save it to a new variable e.g. “my_first_model”**
+PMS1 was identified as a potential modifier gene in Hungington's disease, to study it, we applied a linear model (lm):
+
+-   `(Intercept) = 56.82`: The average expression value of PMS1in healthy (0) patients
+
+-   `Diagnosis = 33.17`: The average change in PMS1 expression when moving from the reference group (0) to the disease group (1).
 
 ```{r}
 my_first_model <- lm(
   PMS1 ~ Diagnosis , 
   data = borovecki_tibble)
-```
 
-**Q7: What are your coefficients? Mine are**
-
-```{r}
+# Obtain coefficients of the model
 coef(my_first_model)
 ```
 
-(Intercept) 56.82 // Diagnosis 33.17
-
-**T8: Use the `group_by()summarise()` workflow to calculate the mean values of the gene expression for your favourite gene stratified on `early_metastasis`**
+I can also obtain these values by grouping by Diagnosis to compute the mean value of the gene PMS1
 
 ```{r}
 borovecki_tibble |>
@@ -81,32 +82,24 @@ borovecki_tibble |>
   )
 ```
 
-**Q9: Discuss in your group: How are your coefficients related to your mean expression values?**
+Both calculations show that PMS1 expression is up-regulated in the disease condition, it is interesting to see if this up-regulation is statistically significant at a level of significance of alfa = 0.05
 
-The intercept of the linear model is the mean expression value of PMS1 for patients (0) without hungington disesase. Whereas the mean expression value for patient (1) with hungington disesase is the sum of the intercept plus the slope (It shows how it decreases or increases the mean of expression when there is early metastasis).
-
-**Q10: Discuss in your group: Is your gene up- or down-regulated from `Diagnosis = 0` to `Diagnosis``= 1` and use the `summary()` function to see if is it statistically significant at a level of significance of alfa = 0.05?**
-
-Although this gene expression tends to be UP-regulated in patients type 1 (positive slope) the p-value is 0.00647 \< 0.05 which indicates that the effect is statistically significant at that alfa = 0.05.
+To do so, we compute summary() within the linear model
 
 ```{r}
 summary(my_first_model)
 ```
 
-All the genes, all the models
+The gene is up-regulated in patients type 1 (positive slope)and the p-value is 0.00647 \< 0.05 which indicates that the effect is statistically significant at that alfa = 0.05.
 
-**Q11: How many genes are there in the gravier data set?**
+## Complete Analysis for the 13041 genes
 
-There are 13041 genes.
-
-**Q12: Discuss in your group, if the** `borovecki_tibble` **is a “wide” or a “long” dataset?**
-
-This is a wide data set because each row is a patient and each column is a gene. Tidy data (long data set) should have a column "gene" that specifies the gene name, another with values (expression) and early metastasis values.
+The complete analysis requires tidy data, to obtain it we will pivot the wide format
 
 ```{r}
 borovecki_tibble_long <- borovecki_tibble  |> 
   pivot_longer(
-    cols = -Diagnosis, # <--- ¡EXCLUYE LA COLUMNA 'Diagnosis'!
+    cols = -Diagnosis,
     names_to = "gene",
     values_to = "log2_expr_level"
   ) |>
@@ -115,7 +108,7 @@ borovecki_tibble_long <- borovecki_tibble  |>
   )
 ```
 
-**T10: Create a `dplyr` pipeline, use the `group_by()` function to group your `gravier_clean_aug_long` dataset by `gene` and then add the `nest()` and `ungroup()` functions to your pipeline**
+Next, we will group the tidy data by `gene` and then add the `nest()` and `ungroup()` functions to your pipeline
 
 ```{r}
 borovecki_tibble_long_nested <- borovecki_tibble_long |> 
@@ -124,67 +117,47 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
   ungroup()
 ```
 
-**Q13: Discuss in your group, what happened to the data?**
+The result is a **`<tibble [13,039× 2]>`** where each row is a gene with a nested data frame that contains multiples rows with (diagnosis + log2_expr_level).
 
-```{r}
-# gravier_clean_aug_long_nested$data[[1]] 
-
-# gravier_clean_aug_long_nested |>
-#   filter(gene == "g2E09") |> 
-#   pull(data)
-```
-
-I have a data fram with different values of early metastasis and log2_expr_level for each gene ID (corresponding to several patients)
-
-**Q14: Moreover, discuss in your group, what does `<tibble [168 × 2]>` mean?**
-
-It's a tibble that has information of 168 patients for 2 variables (early metastasis and expression level) for the same gene
+It's a tibble that has information of **13,039** genes for 2 variables (Diagnosis and log2Exp)
 
 ## Fitting models
 
-The goal is to fit a linear model to each gene
-
-**T11: Use the `group_by()` function to let `R` know, that we want to work *per* gene**
+Next, I want to fit a linear model to each gene, to do so, I have to let `R` know that I want to work per gene
 
 ```{r}
 by_gene <- borovecki_tibble_long_nested |> 
   # The tibble is internally being group by the gene, works for certain functions
   # NEST() need groups
   group_by(gene)
-
-borovecki_tibble_long_nested
-by_gene
 ```
 
-**T12: Then using the `map()`-function, add a new line to your pipeline, where you add a new variable `model_object` to your `gravier_clean_aug_long_nested` dataset, which `R` will compute *per* gene**
+I will now create a function that applies a linear model. Using `map()`, I'll apply this function to `borovecki_tibble_long_nested` *per* gene
+
+-   The result is a **`<tibble [13,039× 3]>`** where each row is a gene with two nested data frames. The first one contains multiples rows with (diagnosis + log2_expr_level), whereas the second one contains the output of the linear function.
 
 ```{r}
+# Define lm function
 linear_model <- function(df) {
   lm(
   log2_expr_level ~ Diagnosis , 
   data = df)
 }
 
+# Apply lm function to each gene
 borovecki_tibble_long_nested  <- borovecki_tibble_long_nested  |>  
   mutate(model_object = map(data, linear_model))
-
-borovecki_tibble_long_nested
 ```
 
-Let's get information from each of the models
+To get information from one specific gene
 
 ```{r}
 borovecki_tibble_long_nested |>
-  
-  # Here, you should replace "g2E09" with whatever was YOUR favourite gene!
+  # My favourite gene!
   filter(gene == "MLH1") |> 
   
-  # Pull() on tibbles: This pulls out the model_object variable.
-  #   Note! This is a list, because we nested!
   pull(model_object) |> 
-  
-  # Pluck() on lists: From the list we got from the last step,
-  #   we "pluck" the first element
+  # "pluck" the first element
   pluck(1) |>
   
   # The result of pluck, is a model object,

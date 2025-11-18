@@ -202,14 +202,16 @@ borovecki_data
 
 ### Classification according to expression level
 
-First, we normalize the data by doing the log2 of expression values.
+As this is microRNA data, we will not get negative values, since we are measuring expression levels. If value is 0, it means there is no expression at all.
+
+We calculate log2 to normalize the data. In this situation, we will have negative values, corresponding to the lowest values in the microRNA data matrix.
 
 ```{r}
 borovecki_data <- borovecki_data |> 
   mutate(log2_expression = log2(expressionValue))
 ```
 
-We need to know the max and min expression level values. As this is microRNA data, we will not get negative values, since we are measuring expression levels. If value is 0, it means there is no expression at all.
+We need to know the min and max values in log2_expression to group the genes and study their expression levels.
 
 ```{r}
 borovecki_data |>
@@ -217,21 +219,16 @@ borovecki_data |>
             max_exp = max(log2_expression))
 ```
 
-```{r}
-ggplot(borovecki_data, aes(x=diagnosis, y=log2_expression)) +
-  geom_boxplot()
-```
-
-In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from 0.1 to 71,782.18, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest ("Very High").
+In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from -3.3219 to 16.1313, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
 
 ```{r}
 borovecki_grouped <- borovecki_data |> 
-  mutate(expressionClass = case_when(log2_expression < 11963.78 ~ "Very Low",
-    11963.78 <= log2_expression & log2_expression < 23927.46 ~ "Low",
-    23927.46 <= log2_expression & log2_expression < 35891.14 ~ "Moderate Low",
-    35891.14 <= log2_expression & log2_expression < 47854.82 ~ "Moderate High",
-    47854.82 <= log2_expression & log2_expression < 59818.50 ~ "High",
-    59818.50 <= log2_expression ~ "Very High"))
+  mutate(expressionClass = case_when(log2_expression < -0.079717 ~ "Very Low",
+    -0.079717 <= log2_expression & log2_expression < 3.162494 ~ "Low",
+    3.162494 <= log2_expression & log2_expression < 6.404705 ~ "Moderate Low",
+    6.404705 <= log2_expression & log2_expression < 9.646916 ~ "Moderate High",
+    9.646916 <= log2_expression & log2_expression < 12.889127 ~ "High",
+    12.889127 <= log2_expression ~ "Very High"))
 
 borovecki_grouped |> 
   select(log2_expression, expressionClass)

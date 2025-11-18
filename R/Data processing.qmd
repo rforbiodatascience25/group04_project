@@ -4,3 +4,135 @@ format: html
 ---
 
 ### Load the libraries
+
+```{r}
+library("tidyverse")
+borovecki_tibble <- readRDS("/net/pupil1/home/people/s253694/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
+```
+
+## Data Visualization I
+
+```{r}
+ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue))+
+  geom_boxplot()
+  
+```
+
+```{r}
+borovecki_tibble |>
+  slice_max(expressionValue, n = 1)
+
+```
+
+```{r}
+borovecki_tibble |>
+  slice_min(expressionValue, n = 1)
+```
+
+```{r}
+library("tidyverse")
+borovecki_tibble |>
+  filter(gene == "HBA1") |>
+  ggplot(aes(x = gene, y = expressionValue)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of HBA1",
+    x = "Gene",
+    y = "Expression Value"
+  )
+```
+
+```{r}
+borovecki_tibble |>
+  filter(gene == "ZNF675") |>
+  ggplot(aes(x = gene, y = expressionValue)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of ZNF675",
+    x = "Gene",
+    y = "Expression Value"
+  )
+```
+
+```{r}
+genes_two <- borovecki_tibble |>
+  filter(gene %in% c("HBA1", "ZNF675"))
+```
+
+```{r}
+genes_wide <- genes_two |>
+  select(sample, gene, expressionValue) |>
+  pivot_wider(names_from = gene, values_from = expressionValue)
+```
+
+```{r}
+ggplot(genes_wide, aes(x = ZNF675, y = HBA1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Comparison of HBA1 vs ZNF675 Expression",
+    x = "ZNF675 expression",
+    y = "HBA1 expression"
+  ) +
+  theme_minimal()
+```
+
+### HTT
+
+<https://doi.org/10.1093/braincomms/fcae418>
+
+Huntington's disease is caused by CAG repeat in the HTT gene. Recent genome-wide Association studies (GWASs) have identified genetic modifiers that influence average age of onset in the disease, among the modifiers several genes related to DNA mismatch repair *FAN1*, *LIG1*, *MLH1*, *MSH3*, *PMS1* and *PMS2*,7 which are thought to impact the somatic expansion of the CAG repeat in vulnerable neural cell types.
+
+#### Expression comparison between HTT and MLH1
+
+```{r}
+genes_relevant <- borovecki_tibble |>
+  filter(gene %in% c("HTT", "MLH1"))
+```
+
+```{r}
+genes_info <- genes_relevant |>
+  select(sample, gene, expressionValue) |>
+  pivot_wider(names_from = gene, values_from = expressionValue)
+```
+
+```{r}
+ggplot(genes_info, aes(x = HTT, y = MLH1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs MHL1 Expression",
+    x = "HTT expression",
+    y = "MHL1 expression"
+  ) 
+```
+
+The relationship between genes is weak and slightly negative, smoothing line slopes down as HTT expression increases.
+
+#### Comparison between HTT and *PMS1*
+
+```{r}
+genes_relevant2 <- borovecki_tibble |>
+  filter(gene %in% c("HTT", "PMS1"))
+
+
+
+
+```
+
+```{r}
+genes_info2 <- genes_relevant2 |>
+  select(sample, gene, expressionValue) |>
+  pivot_wider(names_from = gene, values_from = expressionValue)
+```
+
+```{r}
+ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs PMS1 Expression",
+    x = "HTT expression",
+    y = "PMS1 expression"
+  ) 
+```

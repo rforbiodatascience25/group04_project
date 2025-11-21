@@ -23,23 +23,8 @@ ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue))+
 ```{r}
 borovecki_tibble |>
   slice_max(expressionValue, n = 1)
-
-### s253699
-
-```{r}
-library("tidyverse")
-library("here")
 ```
 
-```{r}
-ggplot(borovecki_tibble |>
-  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, expressionValue, fill = diagnosis)) +
-  geom_boxplot() +
-  theme_minimal()
-  
-
-
-```
 
 ```{r}
 
@@ -155,12 +140,35 @@ ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
   ) 
 ```
 
+## Data Visualization II
+
+```{r}
+library("tidyverse")
+library("here")
+```
+
+
+```{r}
+ggplot(borovecki_tibble |>
+  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, expressionValue, fill = diagnosis)) +
+  geom_boxplot() +
+  theme_minimal()
+  
+
+
+```
+
+
+
+```{r}
 ggplot(borovecki_tibble |>
 filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
   geom_violin() +
   theme_minimal()
 
 ```
+```
+
 
 For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease.
 https://www.uniprot.org/uniprotkb/P42858/entry
@@ -191,6 +199,7 @@ library("patchwork")
 
 borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/projects/groupal_project/data/borovecki_tibble.rds")
 ```
+
 
 ### Data overview and inspections
 

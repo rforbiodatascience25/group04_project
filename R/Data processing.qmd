@@ -152,19 +152,34 @@ library("here")
 ggplot(borovecki_tibble |>
   filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, expressionValue, fill = diagnosis)) +
   geom_boxplot() +
-  theme_minimal()
+  theme_minimal() +
+  labs(
+    title = "Gene expression values in control and symptomatic individuals",
+    x = "genes",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12))
   
 
 
 ```
 
-
+#### Violin plots
 
 ```{r}
 ggplot(borovecki_tibble |>
 filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
   geom_violin() +
-  theme_minimal()
+  theme_minimal() +
+   labs(
+    title = "HTT expression distribution in control vs symptomatic individuals",
+    x = "diagnosis",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12))
+
 
 ```
 ```

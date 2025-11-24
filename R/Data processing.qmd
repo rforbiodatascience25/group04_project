@@ -254,8 +254,12 @@ borovecki_grouped <- borovecki_data |>
     9.646916 <= log2_expression & log2_expression < 12.889127 ~ "High",
     12.889127 <= log2_expression ~ "Very High"))
 
+borovecki_grouped$expressionClass <- factor(borovecki_grouped$expressionClass,
+            levels = c("Very Low", "Low", "Moderate Low",                                                    "Moderate High", "High", "Very High"))
+            
 borovecki_grouped |> 
   select(log2_expression, expressionClass)
+  
 
 ```
 

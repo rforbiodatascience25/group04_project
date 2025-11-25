@@ -12,6 +12,7 @@ library("tidyverse")
 borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 ```
 
+
 ## What is Huntington's disease?
 
 Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas.
@@ -19,6 +20,14 @@ This disease affects areas of the brain that are associated with control of volu
 The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness.
 Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities.
 When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions.
+### Huntington's Disease prevalence
+
+According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation.
+
+Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. 
+https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
+
+
 
 ## Data Visualization I
 

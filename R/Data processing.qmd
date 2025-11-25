@@ -3,6 +3,7 @@ title: "Data processing"
 format: html
 ---
 
+
 ### Load the libraries
 
 ```{r}
@@ -140,3 +141,316 @@ ggplot2::labs(title = paste0("Enrichment: ", chosen_pathway))
 
 
 ```
+
+```{r}
+library("tidyverse")
+borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
+```
+
+
+## What is Huntington's disease?
+
+Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas.
+This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior.
+The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness.
+Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities.
+When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions.
+### Huntington's Disease prevalence
+
+According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation.
+
+Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. 
+https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
+
+
+
+## Data Visualization I
+
+```{r}
+ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue))+
+  geom_boxplot()
+  
+```
+
+```{r}
+borovecki_tibble |>
+  slice_max(expressionValue, n = 1)
+```
+
+
+```{r}
+
+borovecki_tibble |>
+  slice_min(expressionValue, n = 1)
+```
+
+```{r}
+library("tidyverse")
+borovecki_tibble |>
+  filter(gene == "HBA1") |>
+  ggplot(aes(x = gene, y = expressionValue)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of HBA1",
+    x = "Gene",
+    y = "Expression Value"
+  )
+```
+
+```{r}
+borovecki_tibble |>
+  filter(gene == "ZNF675") |>
+  ggplot(aes(x = gene, y = expressionValue)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of ZNF675",
+    x = "Gene",
+    y = "Expression Value"
+  )
+```
+
+```{r}
+genes_two <- borovecki_tibble |>
+  filter(gene %in% c("HBA1", "ZNF675"))
+```
+
+```{r}
+genes_wide <- genes_two |>
+  select(sample, gene, expressionValue) |>
+  pivot_wider(names_from = gene, values_from = expressionValue)
+```
+
+```{r}
+ggplot(genes_wide, aes(x = ZNF675, y = HBA1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Comparison of HBA1 vs ZNF675 Expression",
+    x = "ZNF675 expression",
+    y = "HBA1 expression"
+  ) +
+  theme_minimal()
+```
+
+### HTT
+
+<https://doi.org/10.1093/braincomms/fcae418>
+
+Huntington's disease is caused by CAG repeat in the HTT gene. Recent genome-wide Association studies (GWASs) have identified genetic modifiers that influence average age of onset in the disease, among the modifiers several genes related to DNA mismatch repair *FAN1*, *LIG1*, *MLH1*, *MSH3*, *PMS1* and *PMS2*,7 which are thought to impact the somatic expansion of the CAG repeat in vulnerable neural cell types.
+
+#### Expression comparison between HTT and MLH1
+
+```{r}
+genes_relevant <- borovecki_tibble |>
+  filter(gene %in% c("HTT", "MLH1"))
+```
+
+```{r}
+genes_info <- genes_relevant |>
+  select(sample, gene, expressionValue) |>
+  pivot_wider(names_from = gene, values_from = expressionValue)
+```
+
+```{r}
+ggplot(genes_info, aes(x = HTT, y = MLH1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs MHL1 Expression",
+    x = "HTT expression",
+    y = "MHL1 expression"
+  ) 
+```
+
+The relationship between genes is weak and slightly negative, smoothing line slopes down as HTT expression increases.
+
+#### Comparison between HTT and *PMS1*
+
+```{r}
+genes_relevant2 <- borovecki_tibble |>
+  filter(gene %in% c("HTT", "PMS1"))
+
+
+
+
+```
+
+```{r}
+genes_info2 <- genes_relevant2 |>
+  select(sample, gene, expressionValue) |>
+  pivot_wider(names_from = gene, values_from = expressionValue)
+```
+
+```{r}
+ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs PMS1 Expression",
+    x = "HTT expression",
+    y = "PMS1 expression"
+  ) 
+```
+
+## Data Visualization II
+
+```{r}
+library("tidyverse")
+library("here")
+```
+
+
+```{r}
+ggplot(borovecki_tibble |>
+  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, expressionValue, fill = diagnosis)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Gene expression values in control and symptomatic individuals",
+    x = "genes",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12))
+  
+
+
+```
+
+#### Violin plots
+
+```{r}
+ggplot(borovecki_tibble |>
+filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+  geom_violin() +
+  theme_minimal() +
+   labs(
+    title = "HTT expression distribution in control vs symptomatic individuals",
+    x = "diagnosis",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12))
+
+
+```
+```
+
+
+For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease.
+https://www.uniprot.org/uniprotkb/P42858/entry
+
+```{r}
+ggplot(borovecki_tibble |>
+filter(gene == "PMS1"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+  geom_violin() +
+  theme_minimal()
+```
+
+For PMS1, symptomatic patients show a higher expression level compared to controls.
+
+```{r}
+ggplot(borovecki_tibble |>
+filter(gene == "ZDHHC17"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+  geom_violin() +
+  theme_minimal()
+```
+
+For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
+### Load libraries and data
+
+```{r, echo=FALSE}
+library("tidyverse")
+library("fs")
+library("patchwork")
+
+borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/projects/groupal_project/data/borovecki_tibble.rds")
+```
+
+
+### Data overview and inspections
+
+We load the data to get an overview
+
+```{r}
+borovecki_data
+```
+
+### Classification according to expression level
+
+As this is microRNA data, we will not get negative values, since we are measuring expression levels. If value is 0, it means there is no expression at all.
+
+We calculate log2 to normalize the data. In this situation, we will have negative values, corresponding to the lowest values in the microRNA data matrix.
+
+```{r}
+borovecki_data <- borovecki_data |> 
+  mutate(log2_expression = log2(expressionValue))
+```
+
+We need to know the min and max values in log2_expression to group the genes and study their expression levels.
+
+```{r}
+borovecki_data |>
+  summarise(min_exp = min(log2_expression),
+            max_exp = max(log2_expression))
+```
+
+In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from -3.3219 to 16.1313, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
+
+```{r}
+borovecki_grouped <- borovecki_data |> 
+  mutate(expressionClass = case_when(log2_expression < -0.079717 ~ "Very Low",
+    -0.079717 <= log2_expression & log2_expression < 3.162494 ~ "Low",
+    3.162494 <= log2_expression & log2_expression < 6.404705 ~ "Moderate Low",
+    6.404705 <= log2_expression & log2_expression < 9.646916 ~ "Moderate High",
+    9.646916 <= log2_expression & log2_expression < 12.889127 ~ "High",
+    12.889127 <= log2_expression ~ "Very High"))
+
+borovecki_grouped$expressionClass <- factor(borovecki_grouped$expressionClass,
+            levels = c("Very Low", "Low", "Moderate Low",                                                    "Moderate High", "High", "Very High"))
+            
+borovecki_grouped |> 
+  select(log2_expression, expressionClass)
+  
+
+```
+
+We want to plot the different groups, to have an idea of the distribution in the data.
+
+```{r}
+borovecki_grouped |>
+count(expressionClass) |>
+  
+# Visualization
+ggplot(aes(x = expressionClass,
+           y = n,
+           fill = expressionClass)) +
+  geom_col(colour = "green",
+           fill = "lightgreen",
+           alpha = 0.5) +
+  theme_minimal(base_size = 16) +
+  theme(axis.text.x = element_text(
+        angle = 45,
+        hjust = 1)) +
+  labs(x = "Expression level group",
+       y = "Number of genes",
+       title = "Gene counts per expression category") +
+  theme(legend.position = "none")
+```
+
+After grouping the expression values into six categories, we observed that most genes fall into the lower expression groups, while the uppermost group contains very few genes. This strongly suggests that the maximum value, 71,782.18, is likely an outlier.
+
+In typical gene expression datasets, values usually show a right-skewed distribution, where a small number of genes have extremely high expression levels. The fact that almost all data points are concentrated in the first categories, and only a tiny fraction reaches the highest levels, supports the idea that the extreme value is not representative of the general expression distribution.
+
+Specifically, we will see how many genes are in each expression level group.
+
+```{r}
+# Get total count in each expression group and percent.
+borovecki_grouped |> 
+  count(expressionClass) |> 
+  mutate(percent = round(100 * n / sum(n), 2))
+
+print(expression_counts)
+```
+
+

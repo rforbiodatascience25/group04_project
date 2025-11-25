@@ -262,8 +262,6 @@ borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/project
 
 Before applying any transformation, it is important to inspect the distribution of the raw microRNA expression values. Gene expression data often span several orders of magnitude, and this dataset is no exception. To visualize this, we generated a histogram and a boxplot of the raw expressionValue variable.
 
-The goal of these visualizations is to evaluate whether the original distribution is suitable for statistical analysis, or whether a transformation is needed to improve interpretability and reduce the impact of extreme values.
-
 ```{r}
 # Histogram of raw expression values
 ggplot(borovecki_data, aes(x = expressionValue)) +
@@ -286,7 +284,9 @@ ggplot(borovecki_data, aes(y = expressionValue)) +
        y = "Expression value")
 ```
 
-### Classification according to expression level
+Both plots show that the raw expression values are extremely skewed. Almost all values are concentrated near zero, while one or a few values reach very high levels. This makes it nearly impossible to interpret the distribution or compare expression between genes.
+
+### Log transformation
 
 Since this dataset contains microRNA expression values, the raw counts cannot be negative. A value of 0 simply indicates complete absence of expression for that particular microRNA. However, gene expression data often span several orders of magnitude, which can make the data difficult to interpret and visualize in their original scale.
 
@@ -303,14 +303,15 @@ borovecki_data <- borovecki_tibble |>
   mutate(log2_expression = log2(expressionValue))
 ```
 
-We need to know the min and max values in log2_expression to group the genes and study their expression levels.
+After transforming, we compute the minimum and maximum values:
 
 ```{r}
-
 borovecki_data |>
   summarise(min_exp = min(log2_expression),
             max_exp = max(log2_expression))
 ```
+
+### Classification according to expression level
 
 In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from -3.3219 to 16.1313, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
 
@@ -329,11 +330,9 @@ borovecki_grouped$expressionClass <- factor(borovecki_grouped$expressionClass,
             
 borovecki_grouped |> 
   select(log2_expression, expressionClass)
-  
-
 ```
 
-We want to plot the different groups, to have an idea of the distribution in the data.
+We then generated a bar plot showing how many genes fall into each category.
 
 ```{r}
 borovecki_grouped |>
@@ -367,15 +366,18 @@ Specifically, we will see how many genes are in each expression level group.
 borovecki_grouped |> 
   count(expressionClass) |> 
   mutate(percent = round(100 * n / sum(n), 2))
-
-print(expression_counts)
 ```
+
+
+
+
+### ERIC
 
 We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value < 0.05) and also setting a filter to only select those that are more differentially expressed (estimates > 1 or estimates < -1)
 
 ```{r}
 borovecki_estimates_filtered <- borovecki_estimates |> 
-filter(estimate > 1 | estimate < -1)
+filter(is_significant == "yes")
 ```
 
 We pull the genes (filtered ones and full dataset) and create two .txt documents so that we can copy and paste in ShinyGO and see the enrichment.
@@ -390,3 +392,4 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
+After using these files on ShinyGo, we see no fold enrichment.

@@ -17,7 +17,7 @@ library(msigdbr)
 ### Sol's section
 
 ```{r}
-borovecki_tibble <- readRDS("~/projects/group04_project/data/borovecki_tibble.rds")
+borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 load(file='/home/projects/22140/exercise5_part1.Rdata')
 ```
 
@@ -353,4 +353,22 @@ borovecki_grouped |>
 print(expression_counts)
 ```
 
+We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value < 0.05) and also setting a filter to only select those that are more differentially expressed (estimates > 1 or estimates < -1)
+
+```{r}
+borovecki_estimates_filtered <- borovecki_estimates |> 
+filter(estimate > 1 | estimate < -1)
+```
+
+We pull the genes (filtered ones and full dataset) and create two .txt documents so that we can copy and paste in ShinyGO and see the enrichment.
+
+```{r}
+genes <- borovecki_estimates_filtered |> pull(gene)
+
+writeLines(genes, "genesfilter.txt")
+
+genesall <- borovecki_estimates |> pull (gene)
+
+writeLines(genesall, "genesall.txt")
+```
 

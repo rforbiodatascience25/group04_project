@@ -4,3 +4,139 @@ format: html
 ---
 
 ### Load the libraries
+
+```{r}
+#| message: FALSE
+library(tidyverse)
+library(DESeq2)
+library(fgsea)
+library(msigdbr)
+```
+
+### Sol's section
+
+```{r}
+borovecki_tibble <- readRDS("~/projects/group04_project/data/borovecki_tibble.rds")
+load(file='/home/projects/22140/exercise5_part1.Rdata')
+```
+
+Create format
+
+```{r}
+count <- borovecki_tibble |>
+  # 1. Transformar a formato ancho (Filas=Genes, Columnas=Muestras)
+  pivot_wider(
+    id_cols = gene,
+    names_from = sample,
+    values_from = expressionValue
+  ) |>
+  # 2. Convertir valores de expresión a enteros (¡El paso clave para DESeq2!)
+  mutate(across(where(is.numeric), ~ as.integer(round(.x)))) |>
+  # 3. Quitar la columna 'gene' y convertir a matriz (formato preferido por DESeq2)
+  column_to_rownames(var = "gene") |>
+  as.matrix()
+
+
+
+# 1. Crear la tabla de metadatos 'meta'
+meta <- borovecki_tibble |>
+  # Selecciona las columnas de interés para los metadatos
+  dplyr::select(sample, diagnosis) |>
+  # 2. Retiene solo filas únicas (elimina las repeticiones)
+  distinct() |>
+  # 3. Asigna la columna 'diagnosis' al nombre estándar de DESeq2 'condition'
+  dplyr::rename(condition = diagnosis)
+
+
+```
+
+Repeat this project
+
+```{r}
+dds <- DESeqDataSetFromMatrix(
+  countData = count,
+  colData = meta,
+  # Podría haber hecho también ~ condition + gender
+  design = ~ condition
+)
+```
+
+```{r}
+plotPCA(rlog(dds), intgroup=c("condition"))
+```
+
+Ahora vamos a hacer otras cosinas
+
+```{r}
+dds <- DESeq(dds)
+res <- results(dds)
+# Filtrar y contar los genes con un umbral de 0.05
+n_sig <- sum(res$padj < 0.05, na.rm = TRUE)
+n_sig
+```
+
+gsea
+
+```{r}
+# Extraer la columna de estadísticos y nombres de fila (Símbolos)
+gene_symbols <- rownames(res)
+stat_values <- res[,"stat"]
+names(stat_values) <- gene_symbols
+
+# Mapear Símbolo (KEYTYPE) a Ensembl (COLUMN)
+# Usamos 'SYMBOL' como la clave de entrada
+id_map <- AnnotationDbi::select(
+  org.Hs.eg.db, 
+  keys = gene_symbols, 
+  columns = c("ENSEMBL"), 
+  keytype = "SYMBOL"
+) |> 
+  # Eliminar filas donde no hay mapeo de Ensembl
+  filter(!is.na(ENSEMBL)) |>
+  # Eliminar mapeos duplicados (un símbolo a varios Ensembl)
+  distinct()
+
+# Convertir los resultados de DESeq2 a un data frame temporal
+res_df <- as.data.frame(res) |>
+  tibble::rownames_to_column("SYMBOL") |>
+  # Unir con el mapa de IDs para obtener la columna ENSEMBL
+  left_join(id_map, by = "SYMBOL") |>
+  # Eliminar cualquier fila que no pudo mapearse o tiene stat NA
+  filter(!is.na(stat) & !is.na(ENSEMBL)) |>
+  # Consolidar duplicados (si un mismo ENSEMBL aparece con distintos SÍMBOLOS, tomamos la media)
+  group_by(ENSEMBL) |>
+  summarise(
+    stat_mean = mean(stat)
+  ) |>
+  ungroup()
+
+# Crear el vector final (Ensembl en los nombres)
+myStats_ensembl <- res_df$stat_mean
+names(myStats_ensembl) <- res_df$ENSEMBL
+
+# Ordenar el vector final
+myStats_ensembl <- sort(myStats_ensembl, decreasing = TRUE)
+
+# Re-ejecutar fgsea
+fg <- fgseaMultilevel(pathways = BP_list, stats = myStats_ensembl, minSize = 15, maxSize = 500, scoreType = "std")
+
+
+```
+
+```{r}
+# El resto del código de filtrado debería funcionar ahora
+fg_sig <- fg %>%
+  arrange(padj) %>%
+  filter(padj < 0.05)
+nrow(fg_sig)
+fg_sig[1:10]
+```
+
+```{r}
+chosen_pathway <- fg_sig$pathway[1]
+# Plotear un gráfico donde especifíco todos los genes del GO y los genes de mystat
+plotEnrichment(BP_list[[chosen_pathway]], myStats) +
+ggplot2::labs(title = paste0("Enrichment: ", chosen_pathway))
+
+
+```

@@ -392,4 +392,6 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
-After using these files on ShinyGo, we see no fold enrichment.
+After doing the process on ShinyGO, we see no important fold enrichment on this case.
+
+

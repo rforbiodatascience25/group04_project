@@ -20,6 +20,7 @@ borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 load(file='/home/projects/22140/exercise5_part1.Rdata')
 ```
 
+
 ```{r}
 
 borovecki_tibble<- ("~ /net/pupil1/home/people/s253694/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
@@ -153,6 +154,8 @@ library("tidyverse")
 borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 ```
 
+
+
 ## What is Huntington's disease?
 
 Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas. This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions. \### Huntington's Disease prevalence
@@ -160,6 +163,7 @@ Huntington's disease (HD) is an inherited disorder that causes nerve cells (neur
 According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation.
 
 Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
+
 
 ## Data Visualization I
 
@@ -173,9 +177,14 @@ borovecki_tibble<- readRDS("~/R/r_for_bio_data_science/Group 04/data/borovecki_t
 
 
 
+
 ```{r}
 
+
 ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue))+
+
+ggplot(data = borovecki_grouped, aes(x= diagnosis, y = log2_expression))+
+
   geom_boxplot()
   
 ```
@@ -194,9 +203,9 @@ borovecki_tibble |>
 
 ```{r}
 library("tidyverse")
-borovecki_tibble |>
+borovecki_data |>
   filter(gene == "HBA1") |>
-  ggplot(aes(x = gene, y = expressionValue)) +
+  ggplot(aes(x = gene, y = log2_expression, color = diagnosis)) +
   geom_boxplot() +
   labs(
     title = "Expression of HBA1",
@@ -206,9 +215,9 @@ borovecki_tibble |>
 ```
 
 ```{r}
-borovecki_tibble |>
+borovecki_data |>
   filter(gene == "ZNF675") |>
-  ggplot(aes(x = gene, y = expressionValue)) +
+  ggplot(aes(x = gene, y = log2_expression, color = diagnosis)) +
   geom_boxplot() +
   labs(
     title = "Expression of ZNF675",
@@ -309,13 +318,13 @@ library("here")
 
 ```{r}
 ggplot(borovecki_tibble |>
-  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, expressionValue, fill = diagnosis)) +
+  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
   geom_boxplot() +
   theme_minimal() +
   labs(
     title = "Gene expression values in control and symptomatic individuals",
-    x = "genes",
-    y = "genes expression"
+    x = "Genes",
+    y = "Genes expression"
   ) +
   theme(
     plot.title = element_text(size = 12))
@@ -327,8 +336,8 @@ ggplot(borovecki_tibble |>
 #### Violin plots
 
 ```{r}
-ggplot(borovecki_tibble |>
-filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+ggplot(borovecki_data |>
+filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
   theme_minimal() +
    labs(
@@ -342,23 +351,65 @@ filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
 
 ```
 
-        
+For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease. https://www.uniprot.org/uniprotkb/P42858/entry
 
 
-For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease.
-https://www.uniprot.org/uniprotkb/P42858/entry
+```{r}
+
+ggplot(borovecki_grouped |>
+filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
+  geom_violin() +
+  theme_minimal() +
+  labs(
+    title = "PMS1 expression distribution in control vs symptomatic individuals",
+    x = "diagnosis",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12))
+```
+
 
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
 ```{r}
-
 ggplot(borovecki_tibble |>
 filter(gene == "ZDHHC17"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+
+ggplot(borovecki_grouped |>
+filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
+
   geom_violin() +
-  theme_minimal()
+  theme_minimal() +
+  labs(
+    title = "ZDHHC17 expression distribution in control vs symptomatic individuals",
+    x = "diagnosis",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 10))
 ```
 
+
 For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry \### Load libraries and data
+
+For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
+
+```{r}
+ggplot(borovecki_grouped |>
+  filter(gene %in% c("HTT","PMS1", "PMS2", "ZDHHC17", "HBA1", "ZNF675")), aes(log2_expression, gene, color = diagnosis)) +
+  geom_point() + 
+  theme_minimal() +
+  labs(
+    title = "Gene class expression distribution in control vs symptomatic individuals",
+    x = "Gene expression (log 2)",
+    y = "Genes"
+  ) +
+  theme(
+    plot.title = element_text(size = 10))
+```
+
+### Load libraries and data
 
 ```{r, echo=FALSE}
 
@@ -371,24 +422,50 @@ borovecki_data <- readRDS(file = "~/R/r_for_bio_data_science/Group 04/data/borov
 
 ### Data overview and inspections
 
-We load the data to get an overview
+Before applying any transformation, it is important to inspect the distribution of the raw microRNA expression values. Gene expression data often span several orders of magnitude, and this dataset is no exception. To visualize this, we generated a histogram and a boxplot of the raw expressionValue variable.
 
 ```{r}
-borovecki_data
+# Histogram of raw expression values
+ggplot(borovecki_data, aes(x = expressionValue)) +
+  geom_histogram(bins = 50, fill = "steelblue", alpha = 0.6) +
+  theme_minimal(base_size = 16) +
+  scale_x_continuous(labels = scales::comma) +
+  labs(title = "Distribution of Raw Expression Values",
+       x = "Expression value",
+       y = "Count")
+
 ```
 
-### Classification according to expression level
+```{r}
+# Boxplot of raw expression values (use log10 to avoid flattening)
+ggplot(borovecki_data, aes(y = expressionValue)) +
+  geom_boxplot(fill = "orange", alpha = 0.6) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal(base_size = 16) +
+  labs(title = "Boxplot of Raw Expression Values",
+       y = "Expression value")
+```
 
-As this is microRNA data, we will not get negative values, since we are measuring expression levels. If value is 0, it means there is no expression at all.
+Both plots show that the raw expression values are extremely skewed. Almost all values are concentrated near zero, while one or a few values reach very high levels. This makes it nearly impossible to interpret the distribution or compare expression between genes.
 
-We calculate log2 to normalize the data. In this situation, we will have negative values, corresponding to the lowest values in the microRNA data matrix.
+### Log transformation
+
+Since this dataset contains microRNA expression values, the raw counts cannot be negative. A value of 0 simply indicates complete absence of expression for that particular microRNA. However, gene expression data often span several orders of magnitude, which can make the data difficult to interpret and visualize in their original scale.
+
+To address this, we apply a log2 transformation to the expression values. This transformation serves two purposes:
+
+1. It normalizes the distribution, reducing the influence of extremely large values.
+
+2. It spreads out lower values, making subtle differences more interpretable.
+
+After applying the log2 transformation, it is normal to obtain negative values, which correspond to expression values between 0 and 1 in the original scale. These negative values do not indicate “negative expression,” but rather reflect very low levels of expression.
 
 ```{r}
-borovecki_data <- borovecki_data |> 
+borovecki_data <- borovecki_tibble |> 
   mutate(log2_expression = log2(expressionValue))
 ```
 
-We need to know the min and max values in log2_expression to group the genes and study their expression levels.
+After transforming, we compute the minimum and maximum values:
 
 ```{r}
 
@@ -396,6 +473,8 @@ borovecki_data |>
   summarise(min_exp = min(log2_expression),
             max_exp = max(log2_expression))
 ```
+
+### Classification according to expression level
 
 In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from -3.3219 to 16.1313, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
 
@@ -414,11 +493,9 @@ borovecki_grouped$expressionClass <- factor(borovecki_grouped$expressionClass,
             
 borovecki_grouped |> 
   select(log2_expression, expressionClass)
-  
-
 ```
 
-We want to plot the different groups, to have an idea of the distribution in the data.
+We then generated a bar plot showing how many genes fall into each category.
 
 ```{r}
 
@@ -454,15 +531,17 @@ Specifically, we will see how many genes are in each expression level group.
 borovecki_grouped |> 
   count(expressionClass) |> 
   mutate(percent = round(100 * n / sum(n), 2))
-
-print(expression_counts)
 ```
 
 We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1)
 
+### ERIC
+
+We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value < 0.05) and also setting a filter to only select those that are more differentially expressed (estimates > 1 or estimates < -1)
+
 ```{r}
 borovecki_estimates_filtered <- borovecki_estimates |> 
-filter(estimate > 1 | estimate < -1)
+filter(is_significant == "yes")
 ```
 
 We pull the genes (filtered ones and full dataset) and create two .txt documents so that we can copy and paste in ShinyGO and see the enrichment.
@@ -476,6 +555,7 @@ genesall <- borovecki_estimates |> pull (gene)
 
 writeLines(genesall, "genesall.txt")
 ```
+
 
 Data Visualization I (part II)
 
@@ -651,4 +731,8 @@ ggplot(genes_long, aes(x = HTT, y = log2_exp)) +
 ```
 
 The plot above has all the relevant DNA mismatch repair genes mentioned on the article "Genomic characterization of Huntington’s disease genetic modifiers informs drug target tractability" combined into one single table where the curve summarizes the overall trend across all repair genes and compare them to HTT expression. the plot shows a very slight negative trend. The overall conclusion is that the HTT expression does not strongly influence increasing or decreasing the DNA mismatch repair genes, weak relationship.
+
+After doing the process on ShinyGO, we see no important fold enrichment on this case.
+
+
 

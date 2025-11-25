@@ -149,24 +149,13 @@ borovecki_tibble_long_nested  <- borovecki_tibble_long_nested  |>
   mutate(model_object = map(data, linear_model))
 ```
 
-To get information from one specific gene
+We will now re-order the results to obtain an understandable format:
 
-```{r}
-borovecki_tibble_long_nested |>
-  # My favourite gene!
-  filter(gene == "MLH1") |> 
-  
-  pull(model_object) |> 
-  # "pluck" the first element
-  pluck(1) |>
-  
-  # The result of pluck, is a model object,
-  #   upon which we can call the tidy function
-  tidy(conf.int = TRUE,
-       conf.level = 0.95)
-```
-
-**T13: Scroll a bit back to where we created the `model_object` and see if you can translate that into mapping the `tidy()` function to the `model_object` variable, thereby creating a new variable `model_object_tidy` - This is tricky, so do make sure to discuss in your group how this can be done!**
+1.  Create a `model_object_tidy` that contains tidy data about the estimation (p.value, estimates...)
+2.  Unnest the result
+3.  Unpack the `model_object_tidy`
+4.  Select columns of interest
+5.  Add a variable q.value that denotes the significancy of a gene
 
 ```{r}
 tidy_data <- function(df) {
@@ -175,49 +164,45 @@ tidy_data <- function(df) {
        conf.level = 0.95)
   }
 
-borovecki_tibble_long_nested  <- borovecki_tibble_long_nested  |>  
-  mutate(model_object_tidy = map(model_object, tidy_data))
-
-borovecki_tibble_long_nested
-```
-
-```{r}
-# gravier_clean_aug_long_nested$model_object_tidy[[1]]
-# gravier_clean_aug_long_nested |>
-#   filter(gene == "g2E09") |> # Replace "g2E09" 
-#   pull(model_object_tidy)
-```
-
-**T14: Create a `dplyr` pipeline and save the result in a new variable called `gravier_estimates`: Use the `unnest()` function to unpack the `model_object_tidy`**
-
-```{r}
-borovecki_estimates <- unnest(borovecki_tibble_long_nested, model_object_tidy)
-borovecki_estimates
-```
-
-**T15: Then again, create a `dplyr` pipeline and save the result in a the same `gravier_estimates` variable: Subset the rows to only get the slope term and then choose variables as displayed below, finally end with un-grouping your data, as we no longer need the groups**
-
-```{r}
-borovecki_estimates <- borovecki_estimates |> 
-  filter(term == "Diagnosis")|> 
-  dplyr::select(gene, p.value, estimate, conf.low, conf.high) 
-```
-
-**T16: To your `gravier_estimates` dataset, add a variable `q.value`, which is the result of calling the `p.adjust()` function on your `p.value` variable and also add an indicator variable denoting if a given gene is significant or not**
-
-```{r}
-borovecki_estimates <- borovecki_estimates |> 
+borovecki_estimates <- borovecki_tibble_long_nested |>
+  mutate(model_object_tidy = map(model_object, tidy_data)) |>
+  unnest(model_object_tidy) |>
+  filter(term == "Diagnosis") |>
+  dplyr::select(gene, p.value, estimate, conf.low, conf.high) |> 
   mutate(q.value=p.adjust(p.value),
           is_significant = case_when(
-            p.value >= 0.05 ~ "no",
-            p.value < 0.05 ~ "yes"
-    ))
+            q.value >= 0.05 ~ "no",
+            q.value < 0.05 ~ "yes"
+            ),
+         lbl = case_when(
+           q.value < 0.05 ~ gene,
+           q.value >= 0.05 ~ "")
+         )
 ```
 
-**T17: Re-create this forest plot to finally reveal the results of your analysis**
+Next, we save the object into our data folder
 
 ```{r}
-borovecki_estimates |> 
+saveRDS(borovecki_estimates, file = "~/projects/group04_project/data/borovecki_estimates.rds")
+```
+
+Let's now order the significant genes by their estimates and save the results
+
+```{r}
+ordered_borovecki <- borovecki_estimates |> 
+  filter(is_significant == "yes") |>
+  arrange(desc(abs(estimate)))
+
+saveRDS(ordered_borovecki, file = "~/projects/group04_project/data/ordered_borovecki.rds")
+```
+
+Let's see, plot and save the most differentially expressed genes with a forest plot
+
+-   The image have been saved with the function ggsave()
+
+```{r}
+#| message = FALSE
+forest <- borovecki_estimates |> 
   filter(is_significant == "yes") |> 
   arrange(p.value) |> 
   slice_head(n = 30) |> 
@@ -233,25 +218,24 @@ borovecki_estimates |>
     y = NULL
   ) +
   theme_minimal() 
+
+forest
+
+ggsave(
+  filename = "~/projects/group04_project/results/forest.png", 
+  plot = top30,                                     
+  device = "png",                               
+  dpi = 300   # Resolution
+)
 ```
 
-**T18: Re-create this volcano plot to finally reveal the results of your analysis**
+Let's see, plot and save the most deferentially expressed genes with a forest plot
 
 ```{r}
-borovecki_data <- borovecki_estimates |> 
-  mutate(
-    significance = case_when(
-      q.value < 0.05 ~ "Significant",
-      q.value >= 0.05 ~ "Not Significant"
-    ),
-    lbl = case_when(
-      q.value < 0.05 ~ gene,
-      q.value >= 0.05 ~ ""
-  ))
-
-ggplot(borovecki_data, aes(x = estimate, y = -log10(p.value))) + 
-  geom_point(aes(color=significance, label=lbl), alpha=0.5, size=1) +
-  geom_text_repel(aes(color=significance, label = lbl), size = 2, max.overlaps = Inf) +
+#| message = FALSE
+volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
+  geom_point(aes(color=is_significant, label=lbl), alpha=0.5, size=1) +
+  geom_text_repel(aes(color=is_significant, label = lbl), size = 2, max.overlaps = Inf) +
   labs(
     title = "Genes Associated with hungington disease",
     subtitle = "Genes highlighted in turquoise were significant after multiple testing correction",
@@ -260,4 +244,13 @@ ggplot(borovecki_data, aes(x = estimate, y = -log10(p.value))) +
   ) +
   theme_minimal() +
   theme(legend.position = "none") 
+
+volcano
+
+ggsave(
+  filename = "~/projects/group04_project/results/volcano.png", 
+  plot = top30,                                     
+  device = "png",                               
+  dpi = 300   # Resolution
+)
 ```

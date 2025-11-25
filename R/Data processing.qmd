@@ -3,7 +3,6 @@ title: "Data processing"
 format: html
 ---
 
-
 ### Load the libraries
 
 ```{r}
@@ -21,27 +20,18 @@ borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 load(file='/home/projects/22140/exercise5_part1.Rdata')
 ```
 
-
 ## What is Huntington's disease?
 
-Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas.
-This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior.
-The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness.
-Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities.
-When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions.
-### Huntington's Disease prevalence
+Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas. This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions. \### Huntington's Disease prevalence
 
 According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation.
 
-Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. 
-https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
-
-
+Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
 
 ## Data Visualization I
 
 ```{r}
-ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue))+
+ggplot(data = borovecki_grouped, aes(x= diagnosis, y = log2_expression))+
   geom_boxplot()
   
 ```
@@ -51,7 +41,6 @@ borovecki_tibble |>
   slice_max(expressionValue, n = 1)
 ```
 
-
 ```{r}
 
 borovecki_tibble |>
@@ -60,9 +49,9 @@ borovecki_tibble |>
 
 ```{r}
 library("tidyverse")
-borovecki_tibble |>
+borovecki_data |>
   filter(gene == "HBA1") |>
-  ggplot(aes(x = gene, y = expressionValue)) +
+  ggplot(aes(x = gene, y = log2_expression, color = diagnosis)) +
   geom_boxplot() +
   labs(
     title = "Expression of HBA1",
@@ -72,9 +61,9 @@ borovecki_tibble |>
 ```
 
 ```{r}
-borovecki_tibble |>
+borovecki_data |>
   filter(gene == "ZNF675") |>
-  ggplot(aes(x = gene, y = expressionValue)) +
+  ggplot(aes(x = gene, y = log2_expression, color = diagnosis)) +
   geom_boxplot() +
   labs(
     title = "Expression of ZNF675",
@@ -173,16 +162,15 @@ library("tidyverse")
 library("here")
 ```
 
-
 ```{r}
 ggplot(borovecki_tibble |>
-  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, expressionValue, fill = diagnosis)) +
+  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
   geom_boxplot() +
   theme_minimal() +
   labs(
     title = "Gene expression values in control and symptomatic individuals",
-    x = "genes",
-    y = "genes expression"
+    x = "Genes",
+    y = "Genes expression"
   ) +
   theme(
     plot.title = element_text(size = 12))
@@ -194,8 +182,8 @@ ggplot(borovecki_tibble |>
 #### Violin plots
 
 ```{r}
-ggplot(borovecki_tibble |>
-filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+ggplot(borovecki_data |>
+filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
   theme_minimal() +
    labs(
@@ -208,39 +196,67 @@ filter(gene == "HTT"), aes(diagnosis, expressionValue, fill = diagnosis)) +
 
 
 ```
-```
 
-
-For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease.
-https://www.uniprot.org/uniprotkb/P42858/entry
+For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease. https://www.uniprot.org/uniprotkb/P42858/entry
 
 ```{r}
-ggplot(borovecki_tibble |>
-filter(gene == "PMS1"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+
+ggplot(borovecki_grouped |>
+filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
-  theme_minimal()
+  theme_minimal() +
+  labs(
+    title = "PMS1 expression distribution in control vs symptomatic individuals",
+    x = "diagnosis",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12))
 ```
 
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
 ```{r}
-ggplot(borovecki_tibble |>
-filter(gene == "ZDHHC17"), aes(diagnosis, expressionValue, fill = diagnosis)) +
+
+ggplot(borovecki_grouped |>
+filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
-  theme_minimal()
+  theme_minimal() +
+  labs(
+    title = "ZDHHC17 expression distribution in control vs symptomatic individuals",
+    x = "diagnosis",
+    y = "genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 10))
 ```
 
 For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
+
+```{r}
+ggplot(borovecki_grouped |>
+  filter(gene %in% c("HTT","PMS1", "PMS2", "ZDHHC17", "HBA1", "ZNF675")), aes(log2_expression, gene, color = diagnosis)) +
+  geom_point() + 
+  theme_minimal() +
+  labs(
+    title = "Gene class expression distribution in control vs symptomatic individuals",
+    x = "Gene expression (log 2)",
+    y = "Genes"
+  ) +
+  theme(
+    plot.title = element_text(size = 10))
+```
+
 ### Load libraries and data
 
 ```{r, echo=FALSE}
+
 library("tidyverse")
 library("fs")
 library("patchwork")
 
 borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/projects/groupal_project/data/borovecki_tibble.rds")
 ```
-
 
 ### Data overview and inspections
 
@@ -283,13 +299,14 @@ To address this, we apply a log2 transformation to the expression values. This t
 After applying the log2 transformation, it is normal to obtain negative values, which correspond to expression values between 0 and 1 in the original scale. These negative values do not indicate “negative expression,” but rather reflect very low levels of expression.
 
 ```{r}
-borovecki_data <- borovecki_data |> 
+borovecki_data <- borovecki_tibble |> 
   mutate(log2_expression = log2(expressionValue))
 ```
 
 We need to know the min and max values in log2_expression to group the genes and study their expression levels.
 
 ```{r}
+
 borovecki_data |>
   summarise(min_exp = min(log2_expression),
             max_exp = max(log2_expression))
@@ -298,6 +315,7 @@ borovecki_data |>
 In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from -3.3219 to 16.1313, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
 
 ```{r}
+
 borovecki_grouped <- borovecki_data |> 
   mutate(expressionClass = case_when(log2_expression < -0.079717 ~ "Very Low",
     -0.079717 <= log2_expression & log2_expression < 3.162494 ~ "Low",

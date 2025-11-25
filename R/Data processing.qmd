@@ -20,14 +20,6 @@ borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 load(file='/home/projects/22140/exercise5_part1.Rdata')
 ```
 
-
-```{r}
-
-borovecki_tibble<- ("~ /net/pupil1/home/people/s253694/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
-```
-
-
-
 Create format
 
 ```{r}
@@ -154,8 +146,6 @@ library("tidyverse")
 borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 ```
 
-
-
 ## What is Huntington's disease?
 
 Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas. This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions. \### Huntington's Disease prevalence
@@ -163,7 +153,6 @@ Huntington's disease (HD) is an inherited disorder that causes nerve cells (neur
 According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation.
 
 Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
-
 
 ## Data Visualization I
 
@@ -174,9 +163,6 @@ library(tidyverse)
 ```{r}
 borovecki_tibble<- readRDS("~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
 ```
-
-
-
 
 ```{r}
 
@@ -353,7 +339,6 @@ filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
 
 For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease. https://www.uniprot.org/uniprotkb/P42858/entry
 
-
 ```{r}
 
 ggplot(borovecki_grouped |>
@@ -368,7 +353,6 @@ filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   theme(
     plot.title = element_text(size = 12))
 ```
-
 
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
@@ -389,7 +373,6 @@ filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   theme(
     plot.title = element_text(size = 10))
 ```
-
 
 For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry \### Load libraries and data
 
@@ -454,9 +437,9 @@ Since this dataset contains microRNA expression values, the raw counts cannot be
 
 To address this, we apply a log2 transformation to the expression values. This transformation serves two purposes:
 
-1. It normalizes the distribution, reducing the influence of extremely large values.
+1.  It normalizes the distribution, reducing the influence of extremely large values.
 
-2. It spreads out lower values, making subtle differences more interpretable.
+2.  It spreads out lower values, making subtle differences more interpretable.
 
 After applying the log2 transformation, it is normal to obtain negative values, which correspond to expression values between 0 and 1 in the original scale. These negative values do not indicate “negative expression,” but rather reflect very low levels of expression.
 
@@ -537,7 +520,7 @@ We want to get the genes that are more differentially expressed and we will only
 
 ### ERIC
 
-We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value < 0.05) and also setting a filter to only select those that are more differentially expressed (estimates > 1 or estimates < -1)
+We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1)
 
 ```{r}
 borovecki_estimates_filtered <- borovecki_estimates |> 
@@ -556,14 +539,12 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
-
 Data Visualization I (part II)
 
 ```{r}
 borovecki_data <- borovecki_data |> 
   mutate(log2_expression = log2(expressionValue))
 ```
-
 
 ```{r}
 borovecki_data |>
@@ -588,7 +569,8 @@ borovecki_data |>
     y = "Expression Value"
   )
 ```
-Repair genes expression level boxplot 
+
+Repair genes expression level boxplot
 
 ```{r}
 dnarepair_genes <- c("PMS1", "FAN1", "LIG1", "MLH1", "MSH3", "PMS2")
@@ -612,7 +594,6 @@ dnarepair_plot
 
              
 ```
-
 
 ```{r}
 genes_compare<-borovecki_data|>
@@ -651,7 +632,6 @@ ggplot(genes_wide4, aes(x = HTT, y = LIG1)) +
   ) 
 ```
 
-
 ```{r}
 genes_relevant1 <- borovecki_data |>
   filter(gene %in% c("HTT", "MLH1"))
@@ -670,7 +650,6 @@ ggplot(genes_wide1, aes(x = HTT, y = MLH1)) +
   ) 
 ```
 
-
 ```{r}
 genes_Relevant <- borovecki_data |>
   filter(gene %in% c("HTT", "PMS1"))
@@ -688,19 +667,16 @@ ggplot(genes_wide3, aes(x = HTT, y = PMS1)) +
     y = "PMS1 expression"
   ) 
 ```
- 
 
-There is a significant change in the Data Visualization I part I and Data Visualization I part II. This is because we have applied log2 normalization in gene expression so the data is compressed allowing a better comparison between genes and a more normal-like distribution.
-In the second plots we lose outliers influence, the variation becomes more uniform and the trend line becomes more stable. All this improvements reflect the biological trends more reliably.
+There is a significant change in the Data Visualization I part I and Data Visualization I part II. This is because we have applied log2 normalization in gene expression so the data is compressed allowing a better comparison between genes and a more normal-like distribution. In the second plots we lose outliers influence, the variation becomes more uniform and the trend line becomes more stable. All this improvements reflect the biological trends more reliably.
 
-MHL1, PMS1, LIG1 are all DNA mismatch repair gene, helping the replication errors and maintain genome integrity. We want to analyse what happens to these genes expression compared to HTT. 
+MHL1, PMS1, LIG1 are all DNA mismatch repair gene, helping the replication errors and maintain genome integrity. We want to analyse what happens to these genes expression compared to HTT.
 
 Biologically the relationship between HTT vs PMS1. PMS1 is a DNA is not perfectly linear. At a low HTT expression, PMS1 expression is high at first but then as HTT increases PMS1 expression drops sharply. When the HTT is in a medium expression level the PMS1 tends to increase, it could mean that as the HTT is more expressed the PMS1 reacts to handle the damage. Finally PMS1 expression decreases as HTT is at its highest, this could mean that the repair gene has been overwhelm by the HTT.
 
 The biological relationship between HTT vs MHL1 we can see a similarity with the PSM1 plot. At first the expression of MHL1 is high but it decrease when HTT's expression is low as the HTT increases the MHL1 increase but then when the HTT expression level its high the MHL1 shows a gradual decreases. This results, as the PMS1 before, suggest an impaired mismatch repair capacity when the HTT is elevated.
 
 Finally the relationship between HTT vs LIG1, this plot is shows a slightly positive trend, as the HTT expression level increases, LIG1 increases slowly. But the slope is weak ans the grey region, the interval, is wide meaning the relationship is weak, this could be due to the HTT expression and how it might influence the this DNA repair gene.
-
 
 ```{r}
 genes_repair <- borovecki_data |>
@@ -733,6 +709,3 @@ ggplot(genes_long, aes(x = HTT, y = log2_exp)) +
 The plot above has all the relevant DNA mismatch repair genes mentioned on the article "Genomic characterization of Huntington’s disease genetic modifiers informs drug target tractability" combined into one single table where the curve summarizes the overall trend across all repair genes and compare them to HTT expression. the plot shows a very slight negative trend. The overall conclusion is that the HTT expression does not strongly influence increasing or decreasing the DNA mismatch repair genes, weak relationship.
 
 After doing the process on ShinyGO, we see no important fold enrichment on this case.
-
-
-

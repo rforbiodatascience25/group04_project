@@ -457,7 +457,7 @@ We want to get the genes that are more differentially expressed and we will only
 
 ```{r}
 borovecki_estimates_filtered <- borovecki_estimates |> 
-filter(estimate > 1 | estimate < -1)
+filter(is_significant == "yes")
 ```
 
 We pull the genes (filtered ones and full dataset) and create two .txt documents so that we can copy and paste in ShinyGO and see the enrichment.
@@ -472,3 +472,4 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
+After doing the process on ShinyGO, we see no important enrichment on this case.

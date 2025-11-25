@@ -20,6 +20,142 @@ borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
 load(file='/home/projects/22140/exercise5_part1.Rdata')
 ```
 
+
+```{r}
+
+borovecki_tibble<- ("~ /net/pupil1/home/people/s253694/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
+```
+
+
+
+Create format
+
+```{r}
+count <- borovecki_tibble |>
+  # 1. Transformar a formato ancho (Filas=Genes, Columnas=Muestras)
+  pivot_wider(
+    id_cols = gene,
+    names_from = sample,
+    values_from = expressionValue
+  ) |>
+  # 2. Convertir valores de expresión a enteros (¡El paso clave para DESeq2!)
+  mutate(across(where(is.numeric), ~ as.integer(round(.x)))) |>
+  # 3. Quitar la columna 'gene' y convertir a matriz (formato preferido por DESeq2)
+  column_to_rownames(var = "gene") |>
+  as.matrix()
+
+
+
+# 1. Crear la tabla de metadatos 'meta'
+meta <- borovecki_tibble |>
+  # Selecciona las columnas de interés para los metadatos
+  dplyr::select(sample, diagnosis) |>
+  # 2. Retiene solo filas únicas (elimina las repeticiones)
+  distinct() |>
+  # 3. Asigna la columna 'diagnosis' al nombre estándar de DESeq2 'condition'
+  dplyr::rename(condition = diagnosis)
+
+
+```
+
+Repeat this project
+
+```{r}
+dds <- DESeqDataSetFromMatrix(
+  countData = count,
+  colData = meta,
+  # Podría haber hecho también ~ condition + gender
+  design = ~ condition
+)
+```
+
+```{r}
+plotPCA(rlog(dds), intgroup=c("condition"))
+```
+
+Ahora vamos a hacer otras cosinas
+
+```{r}
+dds <- DESeq(dds)
+res <- results(dds)
+# Filtrar y contar los genes con un umbral de 0.05
+n_sig <- sum(res$padj < 0.05, na.rm = TRUE)
+n_sig
+```
+
+gsea
+
+```{r}
+# Extraer la columna de estadísticos y nombres de fila (Símbolos)
+gene_symbols <- rownames(res)
+stat_values <- res[,"stat"]
+names(stat_values) <- gene_symbols
+
+# Mapear Símbolo (KEYTYPE) a Ensembl (COLUMN)
+# Usamos 'SYMBOL' como la clave de entrada
+id_map <- AnnotationDbi::select(
+  org.Hs.eg.db, 
+  keys = gene_symbols, 
+  columns = c("ENSEMBL"), 
+  keytype = "SYMBOL"
+) |> 
+  # Eliminar filas donde no hay mapeo de Ensembl
+  filter(!is.na(ENSEMBL)) |>
+  # Eliminar mapeos duplicados (un símbolo a varios Ensembl)
+  distinct()
+
+# Convertir los resultados de DESeq2 a un data frame temporal
+res_df <- as.data.frame(res) |>
+  tibble::rownames_to_column("SYMBOL") |>
+  # Unir con el mapa de IDs para obtener la columna ENSEMBL
+  left_join(id_map, by = "SYMBOL") |>
+  # Eliminar cualquier fila que no pudo mapearse o tiene stat NA
+  filter(!is.na(stat) & !is.na(ENSEMBL)) |>
+  # Consolidar duplicados (si un mismo ENSEMBL aparece con distintos SÍMBOLOS, tomamos la media)
+  group_by(ENSEMBL) |>
+  summarise(
+    stat_mean = mean(stat)
+  ) |>
+  ungroup()
+
+# Crear el vector final (Ensembl en los nombres)
+myStats_ensembl <- res_df$stat_mean
+names(myStats_ensembl) <- res_df$ENSEMBL
+
+# Ordenar el vector final
+myStats_ensembl <- sort(myStats_ensembl, decreasing = TRUE)
+
+# Re-ejecutar fgsea
+fg <- fgseaMultilevel(pathways = BP_list, stats = myStats_ensembl, minSize = 15, maxSize = 500, scoreType = "std")
+
+
+```
+
+```{r}
+# El resto del código de filtrado debería funcionar ahora
+fg_sig <- fg %>%
+  arrange(padj) %>%
+  filter(padj < 0.05)
+nrow(fg_sig)
+fg_sig[1:10]
+```
+
+```{r}
+chosen_pathway <- fg_sig$pathway[1]
+# Plotear un gráfico donde especifíco todos los genes del GO y los genes de mystat
+plotEnrichment(BP_list[[chosen_pathway]], myStats) +
+ggplot2::labs(title = paste0("Enrichment: ", chosen_pathway))
+
+
+```
+
+```{r}
+library("tidyverse")
+borovecki_tibble <- readRDS("~/group04_project/data/borovecki_tibble.rds")
+```
+
+
+
 ## What is Huntington's disease?
 
 Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas. This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions. \### Huntington's Disease prevalence
@@ -28,15 +164,33 @@ According to a 2022 review, the incidence of Huntington’s disease was 0.48 new
 
 Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
 
+
 ## Data Visualization I
 
 ```{r}
+library(tidyverse)
+```
+
+```{r}
+borovecki_tibble<- readRDS("~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
+```
+
+
+
+
+```{r}
+
+
+ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue))+
+
 ggplot(data = borovecki_grouped, aes(x= diagnosis, y = log2_expression))+
+
   geom_boxplot()
   
 ```
 
 ```{r}
+
 borovecki_tibble |>
   slice_max(expressionValue, n = 1)
 ```
@@ -199,6 +353,7 @@ filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
 
 For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease. https://www.uniprot.org/uniprotkb/P42858/entry
 
+
 ```{r}
 
 ggplot(borovecki_grouped |>
@@ -214,12 +369,16 @@ filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
     plot.title = element_text(size = 12))
 ```
 
+
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
 ```{r}
+ggplot(borovecki_tibble |>
+filter(gene == "ZDHHC17"), aes(diagnosis, expressionValue, fill = diagnosis)) +
 
 ggplot(borovecki_grouped |>
 filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
+
   geom_violin() +
   theme_minimal() +
   labs(
@@ -230,6 +389,9 @@ filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   theme(
     plot.title = element_text(size = 10))
 ```
+
+
+For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry \### Load libraries and data
 
 For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
 
@@ -255,7 +417,7 @@ library("tidyverse")
 library("fs")
 library("patchwork")
 
-borovecki_data <- read_rds(file = "/net/pupil1/home/people/s253704/R4BDS/projects/groupal_project/data/borovecki_tibble.rds")
+borovecki_data <- readRDS(file = "~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
 ```
 
 ### Data overview and inspections
@@ -306,6 +468,7 @@ borovecki_data <- borovecki_tibble |>
 After transforming, we compute the minimum and maximum values:
 
 ```{r}
+
 borovecki_data |>
   summarise(min_exp = min(log2_expression),
             max_exp = max(log2_expression))
@@ -335,6 +498,7 @@ borovecki_grouped |>
 We then generated a bar plot showing how many genes fall into each category.
 
 ```{r}
+
 borovecki_grouped |>
 count(expressionClass) |>
   
@@ -362,14 +526,14 @@ In typical gene expression datasets, values usually show a right-skewed distribu
 Specifically, we will see how many genes are in each expression level group.
 
 ```{r}
+
 # Get total count in each expression group and percent.
 borovecki_grouped |> 
   count(expressionClass) |> 
   mutate(percent = round(100 * n / sum(n), 2))
 ```
 
-
-
+We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1)
 
 ### ERIC
 
@@ -392,6 +556,183 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
+
+Data Visualization I (part II)
+
+```{r}
+borovecki_data <- borovecki_data |> 
+  mutate(log2_expression = log2(expressionValue))
+```
+
+
+```{r}
+borovecki_data |>
+  filter(gene == "HBA1") |>
+  ggplot(aes(x = gene, y = log2_expression)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of HBA1",
+    x = "Gene",
+    y = "Expression Value"
+  )
+```
+
+```{r}
+borovecki_data |>
+  filter(gene == "ZNF675") |>
+  ggplot(aes(x = gene, y = log2_expression)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of ZNF675",
+    x = "Gene",
+    y = "Expression Value"
+  )
+```
+Repair genes expression level boxplot 
+
+```{r}
+dnarepair_genes <- c("PMS1", "FAN1", "LIG1", "MLH1", "MSH3", "PMS2")
+
+dnarepair_data<- borovecki_data|>
+  filter(gene %in% dnarepair_genes)
+
+dnarepair_plot<-dnarepair_data|>
+  ggplot(aes(x = log2_expression, 
+             y = gene, 
+             fill = diagnosis))+
+  geom_boxplot(alpha = 0.4, width = 0.6, outlier.shape = NA)+
+  labs(
+    x = "Expression level",
+    y = "Genes",
+    title = "Expression of DNA repair genes vs clinical outcome"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+dnarepair_plot
+
+             
+```
+
+
+```{r}
+genes_compare<-borovecki_data|>
+  filter(gene %in% c("ZNF675","HBA1"))
+
+genes_wider <- genes_compare|>
+  select(sample, gene, log2_expression) |>
+  pivot_wider(names_from = gene, values_from = log2_expression)
+
+ggplot(genes_wider, aes(x = ZNF675, y = HBA1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Comparison of HBA1 vs ZNF675 Expression",
+    x = "ZNF675 expression",
+    y = "HBA1 expression"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+genes_relevant0 <- borovecki_data |>
+  filter(gene %in% c("HTT", "LIG1"))
+
+genes_wide4 <- genes_relevant0 |>
+  select(sample, gene, log2_expression) |>
+  pivot_wider(names_from = gene, values_from = log2_expression)
+
+ggplot(genes_wide4, aes(x = HTT, y = LIG1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs LIG1 Expression",
+    x = "HTT expression",
+    y = "LIG1 expression"
+  ) 
+```
+
+
+```{r}
+genes_relevant1 <- borovecki_data |>
+  filter(gene %in% c("HTT", "MLH1"))
+
+genes_wide1 <- genes_relevant1 |>
+  select(sample, gene, log2_expression) |>
+  pivot_wider(names_from = gene, values_from = log2_expression)
+
+ggplot(genes_wide1, aes(x = HTT, y = MLH1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs MHL1 Expression",
+    x = "HTT expression",
+    y = "MHL1 expression"
+  ) 
+```
+
+
+```{r}
+genes_Relevant <- borovecki_data |>
+  filter(gene %in% c("HTT", "PMS1"))
+
+genes_wide3 <- genes_Relevant |>
+  select(sample, gene, log2_expression) |>
+  pivot_wider(names_from = gene, values_from = log2_expression)
+
+ggplot(genes_wide3, aes(x = HTT, y = PMS1)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs PMS1 Expression",
+    x = "HTT expression",
+    y = "PMS1 expression"
+  ) 
+```
+ 
+
+There is a significant change in the Data Visualization I part I and Data Visualization I part II. This is because we have applied log2 normalization in gene expression so the data is compressed allowing a better comparison between genes and a more normal-like distribution.
+In the second plots we lose outliers influence, the variation becomes more uniform and the trend line becomes more stable. All this improvements reflect the biological trends more reliably.
+
+MHL1, PMS1, LIG1 are all DNA mismatch repair gene, helping the replication errors and maintain genome integrity. We want to analyse what happens to these genes expression compared to HTT. 
+
+Biologically the relationship between HTT vs PMS1. PMS1 is a DNA is not perfectly linear. At a low HTT expression, PMS1 expression is high at first but then as HTT increases PMS1 expression drops sharply. When the HTT is in a medium expression level the PMS1 tends to increase, it could mean that as the HTT is more expressed the PMS1 reacts to handle the damage. Finally PMS1 expression decreases as HTT is at its highest, this could mean that the repair gene has been overwhelm by the HTT.
+
+The biological relationship between HTT vs MHL1 we can see a similarity with the PSM1 plot. At first the expression of MHL1 is high but it decrease when HTT's expression is low as the HTT increases the MHL1 increase but then when the HTT expression level its high the MHL1 shows a gradual decreases. This results, as the PMS1 before, suggest an impaired mismatch repair capacity when the HTT is elevated.
+
+Finally the relationship between HTT vs LIG1, this plot is shows a slightly positive trend, as the HTT expression level increases, LIG1 increases slowly. But the slope is weak ans the grey region, the interval, is wide meaning the relationship is weak, this could be due to the HTT expression and how it might influence the this DNA repair gene.
+
+
+```{r}
+genes_repair <- borovecki_data |>
+  filter(gene %in% c("HTT", "PMS1", "FAN1", "LIG1", "MLH1", "MSH3", "PMS2"))
+
+genes_wide5 <- genes_repair |>
+  select(sample, gene, log2_expression) |>
+  pivot_wider(names_from = gene, values_from = log2_expression)
+
+genes_long<- genes_wide5|>
+  pivot_longer(
+    cols = c(PMS1, FAN1, LIG1, MLH1, MSH3, PMS2),
+    names_to = "reapir_genes",
+    values_to = "log2_exp"
+  )|>
+  drop_na(HTT, log2_exp)
+
+
+
+ggplot(genes_long, aes(x = HTT, y = log2_exp)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth() +
+  labs(
+    title = "Comparison of HTT vs Repair gene Expression",
+    x = "HTT expression",
+    y = " Repair gene Expression"
+  ) 
+```
+
+The plot above has all the relevant DNA mismatch repair genes mentioned on the article "Genomic characterization of Huntington’s disease genetic modifiers informs drug target tractability" combined into one single table where the curve summarizes the overall trend across all repair genes and compare them to HTT expression. the plot shows a very slight negative trend. The overall conclusion is that the HTT expression does not strongly influence increasing or decreasing the DNA mismatch repair genes, weak relationship.
+
 After doing the process on ShinyGO, we see no important fold enrichment on this case.
+
 
 

@@ -12,6 +12,14 @@ library("tidyverse")
 borovecki_tibble <- readRDS("/net/pupil1/home/people/s253694/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
 ```
 
+### Huntington's Disease prevalence
+
+According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation.
+
+Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. 
+https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
+
+
 ## Data Visualization I
 
 ```{r}

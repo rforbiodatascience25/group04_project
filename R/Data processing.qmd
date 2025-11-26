@@ -8,9 +8,10 @@ format: html
 ```{r}
 #| message: FALSE
 library(tidyverse)
-library(DESeq2)
-library(fgsea)
-library(msigdbr)
+library(fs)
+library(patchwork)
+
+borovecki_data <- readRDS(file = "~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
 ```
 
 ## What is Huntington's disease?
@@ -257,17 +258,6 @@ ggplot(borovecki_grouped |>
   ) +
   theme(
     plot.title = element_text(size = 10))
-```
-
-### Load libraries and data
-
-```{r, echo=FALSE}
-
-library("tidyverse")
-library("fs")
-library("patchwork")
-
-borovecki_data <- readRDS(file = "~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
 ```
 
 ### Data overview and inspections

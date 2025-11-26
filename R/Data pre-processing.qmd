@@ -40,7 +40,7 @@ The desired output is a tibble with tidy data:
 2.  Each column is a variable
 3.  Each cell is a single value
 
-To obtain so, we will use the library tidyverse to wrangle the data. First, we will first integrate the two lists into a jointed tibble.
+To obtain so, we will use the library tidyverse to wrangle the data. First, we will integrate the two lists into a jointed tibble.
 
 ```{r Obtain a jointed tibble}
 borovecki <- borovecki$x |>

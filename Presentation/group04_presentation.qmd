@@ -1,0 +1,26 @@
+---
+title: "Group04 Presentation R4BDS"
+author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
+format: revealjs
+editor: visual
+---
+
+## Introduction
+
+Huntington disease description
+
+## Materials and Methods
+
+Tools used
+
+## Results
+
+Data wrangling
+
+```{r}
+1 + 1
+```
+
+## Discussion
+
+Visualization

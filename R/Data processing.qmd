@@ -20,10 +20,9 @@ borovecki_tibble <- readRDS(file = "~/group04_project/data/borovecki_tibble.rds"
 borovecki_estimates <- readRDS(file = "~/group04_project/data/borovecki_estimates.rds")
 ```
 
-
 ## What is Huntington's disease?
 
-Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas. This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions. 
+Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help to control voluntary (intentional) movement, as well as other areas. This disease affects areas of the brain that are associated with control of voluntary movement. The people affected by this disease develop uncontrollable movements (chorea) or instead become rigid (akinesia), in addition to that, some patients develop abnormal body postures (dystonia) and also some problems with personality disorders, emotion and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions.
 
 ### Huntington's Disease prevalence
 
@@ -119,7 +118,6 @@ borovecki_grouped |>
 We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1)
 
 ## Data Visualization I
-
 
 ```{r}
 

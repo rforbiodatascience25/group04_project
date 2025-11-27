@@ -30,6 +30,40 @@ According to a 2022 review, the incidence of Huntington’s disease was 0.48 new
 
 Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease. https://www.rarediseaseadvisor.com/disease-info-pages/huntington-disease-epidemiology/
 
+### Data overview and inspections
+
+Before applying any transformation, it is important to inspect the distribution of the raw microRNA expression values. Gene expression data often span several orders of magnitude, and this dataset is no exception. To visualize this, we generated a histogram and a boxplot of the raw expressionValue variable.
+
+```{r}
+# Histogram of raw expression values 
+raw_data1 <- ggplot(borovecki_data, aes(x = expressionValue)) +   
+  geom_histogram(bins = 50, 
+                 fill = "steelblue", 
+                 alpha = 0.6) +   
+  theme_minimal(base_size = 16) +   
+  scale_x_continuous(labels = scales::comma) +   
+  labs(title = "Distribution of Raw Expression Values",        
+       x = "Expression value",        
+       y = "Count") 
+
+raw_data1
+
+ggsave(
+  filename = "~/projects/group04_project/results/raw_data1.png", 
+  device = "png",                               
+  dpi = 300   # Resolution
+)
+```
+
+This plot shows that the raw expression values are extremely skewed. Almost all values are concentrated near zero, while one or a few values reach very high levels. This makes it nearly impossible to interpret the distribution or compare expression between genes.
+
+```{r}
+# Getting min and max values of raw data
+borovecki_data |>
+  summarise(min_exp = min(expressionValue),
+            max_exp = max(expressionValue))
+```
+
 ### Log transformation
 
 Since this dataset contains microRNA expression values, the raw counts cannot be negative. A value of 0 simply indicates complete absence of expression for that particular microRNA. However, gene expression data often span several orders of magnitude, which can make the data difficult to interpret and visualize in their original scale.
@@ -43,6 +77,7 @@ To address this, we apply a log2 transformation to the expression values. This t
 After applying the log2 transformation, it is normal to obtain negative values, which correspond to expression values between 0 and 1 in the original scale. These negative values do not indicate “negative expression,” but rather reflect very low levels of expression.
 
 ```{r}
+# Data transformation
 borovecki_data <- borovecki_tibble |> 
   mutate(log2_expression = log2(expressionValue))
 ```
@@ -50,18 +85,78 @@ borovecki_data <- borovecki_tibble |>
 After transforming, we compute the minimum and maximum values:
 
 ```{r}
-
+# Getting min and max values after log2 transformation
 borovecki_data |>
   summarise(min_exp = min(log2_expression),
             max_exp = max(log2_expression))
 ```
+
+```{r}
+# Comparison between raw data and log2 data
+raw_histogram <- ggplot(borovecki_data, aes(x = expressionValue)) +
+  geom_histogram(bins = 50, fill = "steelblue", alpha = 0.6) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Raw expression values",
+       x = "Expression value",
+       y = "Count") +
+  theme(plot.title = element_text(size = 13, 
+                                  hjust = 0.5)) 
+
+log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression)) +
+  geom_histogram(bins = 50, fill = "darkgreen", alpha = 0.6) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Log2-transformed expression values",
+       x = "log2(Expression value)",
+       y = "Count") +
+  theme(plot.title = element_text(size = 13,
+                                  hjust = 0.5))
+
+raw_histogram + log2_histogram
+
+ggsave(
+  filename = "~/projects/group04_project/results/comparison1_raw_log2.png", 
+  device = "png",                               
+  dpi = 300   # Resolution
+)
+```
+
+```{r}
+# Comparison between raw data and log2 data
+raw_boxplot <- ggplot(borovecki_data, aes(y = expressionValue)) +
+  geom_boxplot(fill = "steelblue", alpha = 0.6) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Raw expression",
+       y = "Expression value") +
+  theme(plot.title = element_text(size = 15,
+                                  hjust = 0.5))
+
+log2_boxplot <- ggplot(borovecki_data, aes(y = log2_expression)) +
+  geom_boxplot(fill = "darkgreen", alpha = 0.6) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Log2 expression",
+       y = "log2(expressionValue)") +
+  theme(plot.title = element_text(size = 15, 
+                                  hjust = 0.5))
+
+raw_boxplot + log2_boxplot
+
+ggsave(
+  filename = "~/projects/group04_project/results/comparison2_raw_log2.png", 
+  device = "png",                               
+  dpi = 300   # Resolution
+)
+```
+
+The raw expression data is highly skewed, with most values clustered near zero and a few extremely high outliers. This makes the distribution difficult to interpret because differences among low and moderate expression levels are compressed and almost invisible. The wide dynamic range also exaggerates the influence of outliers, preventing a clear view of the underlying structure.
+
+After log2 transformation, data becomes more balanced and easier to interpret. High values are compressed and low values are expanded, revealing clear separation between low, moderate-low, moderate-high, and high expression groups. The variance is more stable, outliers are reduced, and the transformed distribution better reflects meaningful biological differences.
 
 ### Classification according to expression level
 
 In the next step, we created a categorical variable that groups gene expression values into six expression categories. Since the minimum and maximum observed expression levels in the dataset range from -3.3219 to 16.1313, we divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
 
 ```{r}
-
+# Grouping according expression level
 borovecki_grouped <- borovecki_data |> 
   mutate(expressionClass = case_when(log2_expression < -0.079717 ~ "Very Low",
     -0.079717 <= log2_expression & log2_expression < 3.162494 ~ "Low",
@@ -97,7 +192,8 @@ ggplot(aes(x = expressionClass,
   labs(x = "Expression level group",
        y = "Number of genes",
        title = "Gene counts per expression category") +
-  theme(legend.position = "none")
+  theme(plot.title = element_text(size = 15, 
+                                  hjust = 0.5))
 
 grouped_log2
 
@@ -107,8 +203,6 @@ ggsave(
   dpi = 300   # Resolution
 )
 ```
-
-After grouping the expression values into six categories, we observed that most genes fall into the lower expression groups, while the uppermost group contains very few genes. This strongly suggests that the maximum value, 71,782.18, is likely an outlier.
 
 In typical gene expression datasets, values usually show a right-skewed distribution, where a small number of genes have extremely high expression levels. The fact that almost all data points are concentrated in the first categories, and only a tiny fraction reaches the highest levels, supports the idea that the extreme value is not representative of the general expression distribution.
 
@@ -349,34 +443,6 @@ ggplot(borovecki_grouped |>
   theme(
     plot.title = element_text(size = 10))
 ```
-
-### Data overview and inspections
-
-Before applying any transformation, it is important to inspect the distribution of the raw microRNA expression values. Gene expression data often span several orders of magnitude, and this dataset is no exception. To visualize this, we generated a histogram and a boxplot of the raw expressionValue variable.
-
-```{r}
-# Histogram of raw expression values
-ggplot(borovecki_data, aes(x = expressionValue)) +
-  geom_histogram(bins = 50, fill = "steelblue", alpha = 0.6) +
-  theme_minimal(base_size = 16) +
-  scale_x_continuous(labels = scales::comma) +
-  labs(title = "Distribution of Raw Expression Values",
-       x = "Expression value",
-       y = "Count")
-
-```
-
-```{r}
-# Boxplot of raw expression values (use log10 to avoid flattening)
-ggplot(borovecki_data, aes(y = expressionValue)) +
-  geom_boxplot(fill = "orange", alpha = 0.6) +
-  scale_y_continuous(labels = scales::comma) +
-  theme_minimal(base_size = 16) +
-  labs(title = "Boxplot of Raw Expression Values",
-       y = "Expression value")
-```
-
-Both plots show that the raw expression values are extremely skewed. Almost all values are concentrated near zero, while one or a few values reach very high levels. This makes it nearly impossible to interpret the distribution or compare expression between genes.
 
 ### ERIC
 

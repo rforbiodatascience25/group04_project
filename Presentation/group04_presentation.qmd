@@ -7,13 +7,109 @@ editor: visual
 
 ## Introduction
 
-Huntington disease description
+Huntington's disease (HD) is an inherited disorder that causes nerve cells (neurons) in parts of the brain to gradually break down and die. The disease attacks areas of the brain that help control voluntary (intentional) movement, as well as other areas. People affected by Huntington 's develop uncontrollable movements (chorea) or instead become rigid (akinesia). In addition, some patients develop an abnormal body postures (dystonia) and also some problems with personality disorders, chancing their emotions and behavior. The symptoms of the disease get worse over time, with them appearing typically in middle-aged people and in children, but with less frequency. When these symptoms appear, they are usually problems with balance or movement, cognitive symptoms, changes in behavior or mild clumsiness. Changes in behavior may include mood swings; feeling irritable (cranky); not being active; or feeling apathetic (uninterested), depressed, or angry. These symptoms may decrease as the disease progresses. But in some people, the symptoms can continue and may include angry outbursts, thoughts of suicide, deep depression, and psychosis (losing touch with reality). People with HD may withdrawal from social activities. When cognitive problems are severe enough that the person cannot function in daily life, the condition is described as dementia. But many people with HD stay aware of their environment and can express their emotions.
+
+#### Huntington's Disease prevalence
+
+According to a 2022 review, the incidence of Huntington’s disease was 0.48 new cases per 100000 people in a year, and the prevalence of the disease was 4.88 cases per 100000 people. This prevalence is higher in Europe, North America and Australia than in Africa or Asia. Health-care accessibility, HTT gene haplotypes and different mutation rates may be a reason for this ethnic variation. Also, an increase of incidence and prevalence is mentioned, due to the advancements in molecular genetic testing which induces an increase in the diagnosis of the disease.
 
 ## Materials and Methods
 
-Tools used
+The data-set selected for this project is Borovecki gene expression, derivative from the study Borovecki et al. 2005, generated using microarray gene expression profiling to investigate changes in the blood of Huntington disease patients. The analysis was performed in the 322 genes most deferentially expressed genes, these were selected from 31 subjects, 17 HD affected subjects and 14 healthy control subjects.
+
+DataSet content:
+
+-   x: Contains the probes IDs and the gene expression values of each sample
+
+-   y: Contains the label of each sample (symptomatic, control)
+
+The desired output to start working with the dataset is a tibble with tidy data:
+
+1.  Each row is an observation
+2.  Each column is a variable
+3.  Each cell is a single value
+
+#### Data Pre-Processing 
+
+To achieve the tidy data:
+
+1.  Integrate, using the tidyverse library, the two lists into a jointed tibble.
+2.  Pivot the columns to obtain a variable called `probeID` accompanied by another called `expressionValue`.
+3.  The information is given for the probe IDs, 25-nucleotide sequences that correspond to genes. It is of interest to convert this information to information per gene. The function `mapIds()` was used as annotation library.
+4.  Average the expression per gene and sample, using `.groups="drop"` to collapse the multiple rows for the same sample and gene into a unique one.
+5.  Save the tidy in another data folder to avoid running this code each time.
+
+#### Linear Modelling 
+
+[Clean the data:]{.underline}
+
+We used `lm()` function, it performs a wide-data format where:
+
+-   Each column is a gene
+
+<!-- -->
+
+-   Each row is a sample denoted with its diagnosis: `0 = healthy`, `1 = disease`
+
+-   Each cell contains the log2(expressionValue)
+
+Huntington's disease is caused by CAG repeat in the HTT gene. Recent genome-wide Association studies (GWASs) have identified genetic modifiers that influence average age of onset in the disease, among the modifiers several genes related to DNA mismatch repair: *FAN1*, *LIG1*, *MLH1*, *MSH3*, *PMS1* and *PMS2*, 7 which are thought to impact the somatic expansion of the CAG repeat in vulnerable neural cell types.
+
+Individual analysis was performed on one of the genes related to DNA mismatch repair, PMS1. To study it, we applied a linear model (lm), we obtained the coefficient of the model by grouping by Diagnosis to compute the mean value of the gene PMS1. This calculation will show us how is the gene expressed. It is up-regulated, to see if it is significant we compute the summary (), the gene is up-regulated in patients type 1 (positive slope)and the p-value is 0.00647 \< 0.05 which indicates that the effect is statistically significant at that alfa = 0.05.
+
+We compute the analysis for all the data to obtain it:
+
+1.  Pivot the wide format
+2.  Group the tidy data by `gene` and then add the `nest()` and `ungroup()` functions to your pipeline.
+
+The result is a **`<tibble [13,039× 2]>`** where each row is a gene with a nested data frame that contains multiples rows with (diagnosis + log2_expr_level). The tibble has information of **13,039** genes for 2 variables (Diagnosis and log2Exp).
+
+Fit a linear model to each gene:
+
+1.  Let `R` know that I want to work per gene.
+2.  Create a function that applies a linear model. Using `map()`, we apply this function to `borovecki_tibble_long_nested` *per* gene. The result is a **`<tibble [13,039× 3]>`** where each row is a gene with two nested data frames. The first one contains multiples rows with (diagnosis + log2_expr_level), whereas the second one contains the output of the linear function.
+3.  Re-order the results to obtain an understandable format and save the object into our data folder.
+
+#### Data Processing 
+
+[Data inspection]{.underline}
+
+Inspect the distribution of the raw microRNA expression values, the plots show that the raw expression values are extremely skewed. Almost all values are concentrated near zero, while one or a few values reach very high levels. This makes it nearly impossible to interpret the distribution or compare expression between genes.
+
+To address this, we apply a log2 transformation to the expression values. This transformation serves two purposes:
+
+1.  Normalise the distribution, reducing the influence of extremely large values.
+
+2.  Spread out lower values, making subtle differences more interpretable.
+
+After applying the log2 transformation, it is normal to obtain negative values, which correspond to expression values between 0 and 1 in the original scale. These negative values do not indicate “negative expression,” but rather reflect very low levels of expression.
+
+[Classification according to expression level]{.underline}
+
+We created a categorical variable that groups gene expression values into six expression categories. We divided this continuous range into six intervals of equal width. Each interval represents a different level of gene expression, from the lowest category ("Very Low") to the highest one ("Very High").
+
+[Significantly expressed genes]{.underline}
+
+We will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1). We pull the genes (filtered ones and full dataset) and create two .txt documents so that we can copy and paste in ShinyGO and see the enrichment.
+
+[Data Visualization]{.underline}
+
+Because we have applied log2 normalization in gene expression the data is compressed allowing a better comparison between genes and a more normal-like distribution. We lose outliers influence, the variation becomes more uniform and the trend line becomes more stable. All this improvements reflect the biological trends more reliably.
+
+```{r, echo=FALSE}
+
+
+```
 
 ## Results
+
+[Plots from the linear model analysis]{.underline}
+
+[Bar plot showing how many genes fall into each category]{.underline}.
+
+Shiny
+
+[Data visualization]{.underline} [plots]{.underline}
 
 Data wrangling
 

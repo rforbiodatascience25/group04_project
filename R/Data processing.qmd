@@ -35,16 +35,20 @@ Also, an increase of incidence and prevalence is mentioned, due to the advanceme
 Before applying any transformation, it is important to inspect the distribution of the raw microRNA expression values. Gene expression data often span several orders of magnitude, and this dataset is no exception. To visualize this, we generated a histogram and a boxplot of the raw expressionValue variable.
 
 ```{r}
+#| message = FALSE
 # Histogram of raw expression values 
 raw_data1 <- ggplot(borovecki_data, aes(x = expressionValue)) +   
   geom_histogram(bins = 50, 
-                 fill = "steelblue", 
+                 fill = "blue", 
                  alpha = 0.6) +   
   theme_minimal(base_size = 16) +   
   scale_x_continuous(labels = scales::comma) +   
   labs(title = "Distribution of Raw Expression Values",        
        x = "Expression value",        
-       y = "Count") 
+       y = "Count") +
+  theme(plot.title = element_text(size = 13,
+                                  hjust = 0.5)) +
+  plot_annotation(caption="Data from: Borovecki et al. 2005")
 
 raw_data1
 
@@ -92,26 +96,29 @@ borovecki_data |>
 ```
 
 ```{r}
+#| message = FALSE
 # Comparison between raw data and log2 data
 raw_histogram <- ggplot(borovecki_data, aes(x = expressionValue)) +
-  geom_histogram(bins = 50, fill = "steelblue", alpha = 0.6) +
+  geom_histogram(bins = 50, fill = "blue", alpha = 0.6) +
   theme_minimal(base_size = 14) +
-  labs(title = "Raw expression values",
+  labs(title = "Raw data",
        x = "Expression value",
        y = "Count") +
   theme(plot.title = element_text(size = 13, 
                                   hjust = 0.5)) 
 
 log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression)) +
-  geom_histogram(bins = 50, fill = "darkgreen", alpha = 0.6) +
+  geom_histogram(bins = 100, fill = "purple", alpha = 0.6) +
   theme_minimal(base_size = 14) +
-  labs(title = "Log2-transformed expression values",
+  labs(title = "Transformed data",
        x = "log2(Expression value)",
        y = "Count") +
   theme(plot.title = element_text(size = 13,
                                   hjust = 0.5))
 
-raw_histogram + log2_histogram
+raw_histogram + log2_histogram + 
+  plot_annotation(title="Comparison between Raw and Log2-Transformed Expression Data", 
+                  caption="Data from: Borovecki et al. 2005")
 
 ggsave(
   filename = "~/projects/group04_project/results/comparison1_raw_log2.png", 
@@ -120,25 +127,43 @@ ggsave(
 )
 ```
 
+Zoom
+
 ```{r}
+#| message = FALSE
+borovecki_data |> 
+  ggplot(aes(x = log2_expression)) +
+  geom_histogram(bins = 100, fill = "purple", alpha = 0.6) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Log2-transformed expression values",
+       x = "log2(Expression value)",
+       y = "Count") +
+  theme(plot.title = element_text(size = 13,
+                                  hjust = 0.5))
+```
+
+```{r}
+#| message = FALSE
 # Comparison between raw data and log2 data
 raw_boxplot <- ggplot(borovecki_data, aes(y = expressionValue)) +
-  geom_boxplot(fill = "steelblue", alpha = 0.6) +
+  geom_boxplot(fill = "blue", alpha = 0.6) +
   theme_minimal(base_size = 14) +
-  labs(title = "Raw expression",
+  labs(title = "Raw data",
        y = "Expression value") +
   theme(plot.title = element_text(size = 15,
                                   hjust = 0.5))
 
 log2_boxplot <- ggplot(borovecki_data, aes(y = log2_expression)) +
-  geom_boxplot(fill = "darkgreen", alpha = 0.6) +
+  geom_boxplot(fill = "purple", alpha = 0.6) +
   theme_minimal(base_size = 14) +
-  labs(title = "Log2 expression",
+  labs(title = "Transformed data",
        y = "log2(expressionValue)") +
   theme(plot.title = element_text(size = 15, 
                                   hjust = 0.5))
 
-raw_boxplot + log2_boxplot
+raw_boxplot + log2_boxplot +
+  plot_annotation(title="Comparison between Raw and Log2-Transformed Expression Data", 
+                  caption="Data from: Borovecki et al. 2005")
 
 ggsave(
   filename = "~/projects/group04_project/results/comparison2_raw_log2.png", 
@@ -175,6 +200,7 @@ borovecki_grouped |>
 We then generated a bar plot showing how many genes fall into each category.
 
 ```{r}
+#| message = FALSE
 grouped_log2 <- borovecki_grouped |>
 count(expressionClass) |>
   
@@ -182,8 +208,8 @@ count(expressionClass) |>
 ggplot(aes(x = expressionClass,
            y = n,
            fill = expressionClass)) +
-  geom_col(colour = "green",
-           fill = "lightgreen",
+  geom_col(colour = "purple",
+           fill = "purple",
            alpha = 0.5) +
   theme_minimal(base_size = 16) +
   theme(axis.text.x = element_text(
@@ -193,7 +219,8 @@ ggplot(aes(x = expressionClass,
        y = "Number of genes",
        title = "Gene counts per expression category") +
   theme(plot.title = element_text(size = 15, 
-                                  hjust = 0.5))
+                                  hjust = 0.5)) +
+  plot_annotation(caption="Data from: Borovecki et al. 2005")
 
 grouped_log2
 

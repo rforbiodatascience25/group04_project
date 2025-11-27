@@ -16,8 +16,8 @@ library(patchwork)
 ## Load the data
 
 ```{r}
-borovecki_tibble <- readRDS(file = "~/group04_project/data/borovecki_tibble.rds")
-borovecki_estimates <- readRDS(file = "~/group04_project/data/borovecki_estimates.rds")
+borovecki_tibble <- readRDS(file = "~/projects/group04_project/data/borovecki_tibble.rds")
+borovecki_estimates <- readRDS(file = "~/projects/group04_project/data/borovecki_estimates.rds")
 ```
 
 ## What is Huntington's disease?
@@ -80,8 +80,7 @@ borovecki_grouped |>
 We then generated a bar plot showing how many genes fall into each category.
 
 ```{r}
-
-borovecki_grouped |>
+grouped_log2 <- borovecki_grouped |>
 count(expressionClass) |>
   
 # Visualization
@@ -99,6 +98,14 @@ ggplot(aes(x = expressionClass,
        y = "Number of genes",
        title = "Gene counts per expression category") +
   theme(legend.position = "none")
+
+grouped_log2
+
+ggsave(
+  filename = "~/projects/group04_project/results/grouped_log2.png", 
+  device = "png",                               
+  dpi = 300   # Resolution
+)
 ```
 
 After grouping the expression values into six categories, we observed that most genes fall into the lower expression groups, while the uppermost group contains very few genes. This strongly suggests that the maximum value, 71,782.18, is likely an outlier.

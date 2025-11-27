@@ -18,12 +18,12 @@ library(dplyr)
 ```{r Load the data}
 # Define the URL of the file
 target_url <- "https://raw.githubusercontent.com/ramhiser/datamicroarray/master/data/borovecki.RData"
-output_file <- "~/projects/group04_project/data/borovecki.RData"
+output_file <- "~/projects/group04_project/_raw/borovecki.RData"
 
 # Download the file
 curl::curl_download(url = target_url, destfile = output_file)
 
-load("~/projects/group04_project/data/borovecki.RData") 
+load("~/projects/group04_project/_raw/borovecki.RData") 
 ```
 
 ### Pre-processing of the data
@@ -93,7 +93,6 @@ A common occurrence in microarrays is that several probes map to the same gene. 
 borovecki_geneLevel <- borovecki |>
   group_by(sample, gene) |>
   summarise(expression = mean(expression), .groups = "drop")
-
 ```
 
 The last chunk of code has taken a long time to run, so in order to access the tibble we created without having to run the code every time, we're going to save it in the data folder

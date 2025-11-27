@@ -11,7 +11,7 @@ library(tidyverse)
 library(fs)
 library(patchwork)
 
-borovecki_data <- readRDS(file = "~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
+borovecki_data <- readRDS(file = "~/projects/group04_project/data/borovecki_tibble.rds")
 ```
 
 ## What is Huntington's disease?
@@ -29,7 +29,7 @@ library(tidyverse)
 ```
 
 ```{r}
-borovecki_tibble<- readRDS("~/R/r_for_bio_data_science/Group 04/data/borovecki_tibble.rds")
+borovecki_data <- readRDS(file = "~/projects/group04_project/data/borovecki_tibble.rds")
 ```
 
 ```{r}

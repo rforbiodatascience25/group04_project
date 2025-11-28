@@ -412,8 +412,9 @@ ggsave(
 
 #### Violin plots
 
+In order to understand better how the gene expression values change between diagnosis and control individuals, we decided to compare the data using violin plots.
 ```{r}
-ggplot(borovecki_grouped |>
+HTT_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
   theme_minimal() +
@@ -425,6 +426,13 @@ filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   theme(
     plot.title = element_text(size = 12))
 
+ggsave(
+  filename = "~/projects/group04_project/results/HTT_expression_violin.png",
+  plot = HTT_expression_violin,
+  device = "png",
+  dpi = 300,
+)
+
 
 ```
 
@@ -432,7 +440,7 @@ For HTT gene, symptomatic patientes tend to show a lower gene expression level c
 
 ```{r}
 
-ggplot(borovecki_grouped |>
+PMS1_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
   theme_minimal() +
@@ -443,13 +451,20 @@ filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   ) +
   theme(
     plot.title = element_text(size = 12))
+
+ggsave(
+  filename = "~/projects/group04_project/results/PMS1_expression_violin.png",
+  plot = PMS1_expression_violin,
+  device = "png",
+  dpi = 300,
+)
 ```
 
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
 ```{r}
 
-ggplot(borovecki_grouped |>
+ZDHHC17_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
 
   geom_violin() +
@@ -461,12 +476,19 @@ filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   ) +
   theme(
     plot.title = element_text(size = 10))
+
+ggsave(
+filename = "~/projects/group04_project/results/ZDHHC17_expression_violin.png",
+  plot = ZDHHC17_expression_violin,
+  device = "png",
+  dpi = 300,
+)
 ```
 
-For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry \### Load libraries and data
+For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry 
 
 ```{r}
-ggplot(borovecki_grouped |>
+genesExpression_geompoint <- ggplot(borovecki_grouped |>
   filter(gene %in% c("HTT","PMS1", "PMS2", "ZDHHC17", "HBA1", "ZNF675")), aes(log2_expression, gene, color = diagnosis)) +
   geom_point() + 
   theme_minimal() +
@@ -477,6 +499,13 @@ ggplot(borovecki_grouped |>
   ) +
   theme(
     plot.title = element_text(size = 10))
+
+ggsave(
+filename = "~/projects/group04_project/results/genesExpression_geompoint.png",
+  plot = genesExpression_geompoint,
+  device = "png",
+  dpi = 300,
+)
 ```
 
 ### ERIC

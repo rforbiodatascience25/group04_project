@@ -27,7 +27,7 @@ The desired output to start working with the dataset is a tibble with tidy data:
 
 </div>
 
-## Materials and methods: Wrangling I: initial tibble
+## Materials and methods: Wrangling I: Initial tibble
 
 <br>
 
@@ -49,7 +49,11 @@ borovecki <- borovecki$x |>
 
 ## Materials and methods: Wrangling II: Pivot_longer
 
+<br>
+
 We make use of the pivot function in order to get all the columns containing the different genes and including them all in the same column called probeID and placing the values from the different probe IDs into a new column called expressionValue.
+
+<br>
 
 ```{r eval=FALSE}
 borovecki <- borovecki |>
@@ -63,7 +67,7 @@ borovecki <- borovecki |>
 
 ## Bioconductor
 
-Explicar el annotation package
+Explicar el annotation packag
 
 Gracias al paquete hgu133a.db (database) podemos asociar los probes a genes a partir de la columna SYMBOL. (código de Sol)
 

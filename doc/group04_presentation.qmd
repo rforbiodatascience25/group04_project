@@ -3,25 +3,21 @@ title: "Group04 Presentation R4BDS"
 author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
 format: revealjs
 editor: visual
+css: styles.css
+echo: True
 ---
-
-## Content
-Group 04 R for Bio Data Science
-Eric Calaveras
-Sol Escamilla
-Beatriz García
-Lucía López
-Diego Medina
-
-Microarray data processing and visualization
 
 ## Introduction
 
+<div>
+
+Dataset obtained from an article (Borovecki et al. 2005) about the correlation between the expression of different genes with the development of Huntington's disease.
+
 Dataset content:
 
--   x: probes IDs and  gene expression values of each sample
+-   x: Probes IDs and gene expression values of each sample
 
--   y: diagnosis (symptomatic, control)
+-   y: Diagnosis (symptomatic, control)
 
 The desired output to start working with the dataset is a tibble with tidy data:
 
@@ -29,13 +25,41 @@ The desired output to start working with the dataset is a tibble with tidy data:
 2.  Each column is a variable
 3.  Each cell is a single value
 
-## Wrangling I: initial tibble
+</div>
 
-Explicar por qué necesitamos agregar sample/diagnosis y convertir a tibble
+## Materials and methods: Wrangling I: initial tibble
 
-## Wrangling II: Pivot_longer
+<br>
 
-Explicar que pasar los probes a filas es el paso más importante para tener "tidy data", y por qué esto facilita cualquier análisis despues.
+With the data that we had, we created a tibble, where X is now a new column containing the samples from the microarray in order and Y is a new column containing the diagnosis of the patient in that respective sample.
+
+Apart from that we have different columns for each sample representing all the genes from each one.
+
+<br>
+
+```{r eval=FALSE}
+borovecki <- borovecki$x |>
+  as_tibble() |>
+  mutate(
+    sample = row_number(), 
+    .before = 1, 
+    diagnosis = borovecki$y
+  )
+```
+
+## Materials and methods: Wrangling II: Pivot_longer
+
+We make use of the pivot function in order to get all the columns containing the different genes and including them all in the same column called probeID and placing the values from the different probe IDs into a new column called expressionValue.
+
+```{r eval=FALSE}
+borovecki <- borovecki |>
+  pivot_longer(
+    cols = ends_with("at"),
+    names_to = "probeID", 
+    values_to = "expressionValue",
+    values_drop_na = TRUE
+  )
+```
 
 ## Bioconductor
 
@@ -51,17 +75,11 @@ Explicar que en microarrays varios probes mapean a un mismo gen, reduciendo ruid
 
 ## Log2 transformation and categories
 
-Poner en la diapo:
-- gráfico del antes/despues
-- distribución raw vs log2
+Poner en la diapo: - gráfico del antes/despues - distribución raw vs log2
 
-Explicar: 
-- Log2 reduce la diferencia entre valores bajos y altos.
-- Mejora visualización y normaliza la escala.
-- Explicar por qué aparecen valores negativos.
+Explicar: - Log2 reduce la diferencia entre valores bajos y altos. - Mejora visualización y normaliza la escala. - Explicar por qué aparecen valores negativos.
 
 ## Visualization 1
-
 
 ```{r, echo=FALSE}
 
@@ -69,8 +87,6 @@ Explicar:
 ```
 
 ## Visualization 2
-
-
 
 ## Discussion
 

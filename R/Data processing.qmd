@@ -386,7 +386,7 @@ library("here")
 ```
 
 ```{r}
-ggplot(borovecki_grouped |>
+geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
   filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
   geom_boxplot() +
   theme_minimal() +
@@ -396,7 +396,15 @@ ggplot(borovecki_grouped |>
     y = "Genes expression"
   ) +
   theme(
-    plot.title = element_text(size = 12))
+    plot.title = element_text(size = 12)) 
+
+ggsave(
+  filename = "~/projects/group04_project/results/geneExpression_comparison_boxplot.png",
+  plot = geneExpression_comparison_boxplot,
+  device = "png",
+  dpi = 300,
+)
+  
   
 
 

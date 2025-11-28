@@ -67,9 +67,30 @@ borovecki <- borovecki |>
 
 ## Bioconductor
 
-Explicar el annotation packag
+<br>
 
-Gracias al paquete hgu133a.db (database) podemos asociar los probes a genes a partir de la columna SYMBOL. (código de Sol)
+The hgu133a.db package is useful to handle Affymetrix Human Genome U133A Microarrays as it allows us to do many different annotations.
+
+In our case, thanks to the hgu133a.db package, we were able to annotate all the different probe IDs into real gene names so that the posterior work was done more easily.
+
+<br>
+
+```{r eval=FALSE}
+#| message = FALSE
+borovecki <- borovecki |>
+  mutate(
+    gene = mapIds(
+      hgu133a.db, 
+      keys=probeID, 
+      keytype = "PROBEID", 
+      column="SYMBOL",
+      multiVals="first"
+    )
+  ) |>
+  filter(!is.na(gene)) |>
+  # I specify the package because AnnotationDbi also has a select function
+  dplyr::select(-probeID)
+```
 
 ## Obtaining gene-level data
 

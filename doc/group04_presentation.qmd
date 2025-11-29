@@ -13,6 +13,8 @@ echo: True
 
 <br>
 
+![](images/Borovecki$x-01.png){fig-align="center"}
+
 </div>
 
 ## Materials and methods
@@ -21,11 +23,9 @@ echo: True
 
 <br>
 
-------------------------------------------------------------------------
-
+---
 layout: 2-col
-
-------------------------------------------------------------------------
+---
 
 ::: column
 ```{r eval=FALSE}
@@ -45,30 +45,20 @@ borovecki <- borovecki |>
     values_to = "expressionValue",
     values_drop_na = TRUE
   )
-
 ```
-:::
-
-::: column
-
-Imagen de la tibble
 :::
 
 ## Materials and methods
 
-<<<<<<< HEAD
-#### Data Wrangling: From to tidydata
-=======
-#### Wrangling II Pivot_longer
->>>>>>> e2cff1ddcb25836e1f8aa3d6a87622ab6db0414a
+#### Data Wrangling: From raw to tidydata
 
 ---
 layout: 2-col
 ---
 
 ::: column
-```{r}
-#| message = FALSE
+```{r eval=FALSE}
+
 borovecki <- borovecki |>
   mutate(
     gene = mapIds(
@@ -80,36 +70,32 @@ borovecki <- borovecki |>
     )
   ) |>
   filter(!is.na(gene)) |>
-  # I specify the package because AnnotationDbi also has a select function
   dplyr::select(-probeID)
 
 borovecki_geneLevel <- borovecki |>
   group_by(sample, gene) |>
   summarise(expression = mean(expression), .groups = "drop")
-
 ```
-:::
-
-::: column
-imagen de la tibble
 :::
 
 ## Materials and methods
 
-#### Normalization: From messy to tiddy
+#### Normalization: From messy to tidy
 
 ![](images/comparison1_raw_log2-05.png){fig-align="center"}
 
 ## Materials and methods
 
-#### Linear Modelling 
+#### Linear Modelling
+
+<br>
 
 ---
 layout: 2-col
 ---
 
 ::: column
-```{r}
+```{r eval=FALSE}
 borovecki_tibble <- borovecki_tibble |>
   pivot_wider(
     # Columns not to pivot
@@ -144,7 +130,11 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 :::
 
 ::: column
-imagen de la tibble
+![](images/Borovecki_tibble.png){width="500"}
+
+![](images/borovecki__tibble_long.png){width="500"}
+
+![](images/borovecki_tibble_long_nested_prelm.png){width="500"}
 :::
 
 ## Materials and methods
@@ -158,23 +148,42 @@ layout: 2-col
 ---
 
 ::: column
-```{r}
+```{r eval=FALSE}
 by_gene <- borovecki_tibble_long_nested |> 
   group_by(gene)
-# Define lm function
 linear_model <- function(df) {
   lm(
   log2_expr_level ~ Diagnosis , 
   data = df)
 }
-# Apply lm function to each gene
 borovecki_tibble_long_nested  <- borovecki_tibble_long_nested  |>  
   mutate(model_object = map(data, linear_model))
+tidy_data <- function(df) {
+  df |>
+  tidy(conf.int = TRUE,
+       conf.level = 0.95)
+  }
+borovecki_estimates <- borovecki_tibble_long_nested |>
+  mutate(model_object_tidy = map(model_object, tidy_data)) |>
+  unnest(model_object_tidy) |>
+  filter(term == "Diagnosis") |>
+  dplyr::select(gene, p.value, estimate, conf.low, conf.high) |> 
+  mutate(q.value=p.adjust(p.value),
+          is_significant = case_when(
+            q.value >= 0.05 ~ "no",
+            q.value < 0.05 ~ "yes"
+            ),
+         lbl = case_when(
+           q.value < 0.05 ~ gene,
+           q.value >= 0.05 ~ "")
+         )
 ```
 :::
 
 ::: column
-imagen
+![](images/borovecki_tibble_long_nested.png)
+
+![](images/borovecki_estimate.png)
 :::
 
 ## Results

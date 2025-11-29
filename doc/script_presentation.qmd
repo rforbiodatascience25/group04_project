@@ -27,7 +27,7 @@ The desired output to start working with the dataset is a tibble with tidy data:
 2.  Each column is a variable
 3.  Each cell is a single value
 
-#### Data Pre-Processing 
+#### Data Pre-Processing
 
 To achieve the tidy data:
 
@@ -37,7 +37,7 @@ To achieve the tidy data:
 4.  Average the expression per gene and sample, using `.groups="drop"` to collapse the multiple rows for the same sample and gene into a unique one.
 5.  Save the tidy in another data folder to avoid running this code each time.
 
-#### Linear Modelling 
+#### Linear Modelling
 
 [Clean the data:]{.underline}
 
@@ -68,7 +68,7 @@ Fit a linear model to each gene:
 2.  Create a function that applies a linear model. Using `map()`, we apply this function to `borovecki_tibble_long_nested` *per* gene. The result is a **`<tibble [13,039× 3]>`** where each row is a gene with two nested data frames. The first one contains multiples rows with (diagnosis + log2_expr_level), whereas the second one contains the output of the linear function.
 3.  Re-order the results to obtain an understandable format and save the object into our data folder.
 
-#### Data Processing 
+#### Data Processing
 
 [Data inspection]{.underline}
 

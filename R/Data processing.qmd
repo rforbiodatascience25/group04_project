@@ -249,13 +249,20 @@ We want to get the genes that are more differentially expressed and we will only
 
 ```{r}
 
-
-ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue)) +
+Expression_value_vs_log2Expression <- ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue)) +
   geom_boxplot() +
 
-ggplot(data = borovecki_grouped, aes(x= diagnosis, y = log2_expression))+
+ggplot(data = borovecki_grouped, aes(x= diagnosis, y = log2_expression, color = diagnosis))+
 
   geom_boxplot()
+
+ggsave(
+  filename = "~/projects/group04_project/results/Expression_value_vs_log2Expression.png",
+  plot = Expression_value_vs_log2Expression,
+  device = "png",
+  dpi = 300,
+)
+
   
 ```
 
@@ -338,7 +345,7 @@ genes_info <- genes_relevant |>
 ```
 
 ```{r}
-ggplot(genes_info, aes(x = HTT, y = MLH1)) +
+Comparison_of_HTT_vs_MHL1_Expression <- ggplot(genes_info, aes(x = HTT, y = MLH1)) +
   geom_point(alpha = 0.6) +
   geom_smooth() +
   labs(
@@ -346,6 +353,12 @@ ggplot(genes_info, aes(x = HTT, y = MLH1)) +
     x = "HTT expression",
     y = "MHL1 expression"
   ) 
+ggsave(
+  filename = "~/projects/group04_project/results/Comparison_of_HTT_vs_MHL1_Expression.png",
+  plot = Comparison_of_HTT_vs_MHL1_Expression,
+  device = "png",
+  dpi = 300,
+)
 ```
 
 The relationship between genes is weak and slightly negative, smoothing line slopes down as HTT expression increases.
@@ -368,7 +381,7 @@ genes_info2 <- genes_relevant2 |>
 ```
 
 ```{r}
-ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
+Comparison_of_HTT_vs_PMS1_Expression <- ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
   geom_point(alpha = 0.6) +
   geom_smooth() +
   labs(
@@ -376,6 +389,12 @@ ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
     x = "HTT expression",
     y = "PMS1 expression"
   ) 
+ggsave(
+  filename = "~/projects/group04_project/results/Comparison_of_HTT_vs_PMS1_Expression.png",
+  plot = Comparison_of_HTT_vs_PMS1_Expression,
+  device = "png",
+  dpi = 300,
+)
 ```
 
 ## Data Visualization II
@@ -413,6 +432,7 @@ ggsave(
 #### Violin plots
 
 In order to understand better how the gene expression values change between diagnosis and control individuals, we decided to compare the data using violin plots.
+
 ```{r}
 HTT_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
@@ -485,7 +505,7 @@ filename = "~/projects/group04_project/results/ZDHHC17_expression_violin.png",
 )
 ```
 
-For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry 
+For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
 
 ```{r}
 genesExpression_geompoint <- ggplot(borovecki_grouped |>

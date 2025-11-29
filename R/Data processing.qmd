@@ -394,7 +394,8 @@ geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
     title = "Gene expression values in control and symptomatic individuals",
     x = "Genes",
     y = "Genes expression"
-  ) +
+  ) + 
+  plot_annotation(caption="Data from: Borovecki et al. 2005")+
   theme(
     plot.title = element_text(size = 12)) 
 
@@ -405,9 +406,6 @@ ggsave(
   dpi = 300,
 )
   
-  
-
-
 ```
 
 #### Violin plots

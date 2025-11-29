@@ -62,7 +62,7 @@ borovecki <- borovecki |>
 
 ## Materials and methods
 
-####  Wrangling II Pivot_longer
+#### Wrangling II Pivot_longer
 
 <br>
 
@@ -170,22 +170,42 @@ borovecki_tibble_long <- borovecki_tibble  |>
 
 ## Results
 
-<br>
+#### Dataset exploration in established genetic modifiers
 
-![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome.png){fig-align="center"}
+![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center"}
 
 ## Results
 
+#### Forest Plot
+
 <br>
 
-![](images/forest-02.png){fig-align="center"}
+![](images/forest-04.png){fig-align="center"}
+
+## Results
+
+#### Volcano Plot
+
+<br>
+
+![](images/volcano-01.png){fig-align="center"}
 
 ## Discussion
 
 <br>
 
-The use of different functions in RStudio has allowed us to modify the initial raw dataset making it tidy so that we could work with it. By doing that, it became easier for us to see the genes that were more differentially expressed between patients with HD and control. Also, bibliography reading was used to get information about the genes implied in the development of the disease. Combining our tidy data with the bibliography, allowed us to see the difference in the expressions by applying different plots.
+-   Use of different functions in RStudio allowed us to tidy the initial raw dataset to work with it.
 
-<br>
+-   Combining our tidy data with the bibliography, allowed us to see the difference in the expressions by applying different plots.
 
-This methodology could also be translated for other diseases in the future, creating bonds between hospitals and bioinformaticians to use the data they obtain to give us a better understanding of how different diseases work and express themselves by regulating their gene expression.
+    <br>
+
+    #### Future perspectives
+
+    <br>
+
+-   This methodology could be translated for other diseases in the future.
+
+-   More collaboration between hospitals and bioinformaticians to use the data they obtain in order to get a better understanding of how different diseases work.
+
+    #### 

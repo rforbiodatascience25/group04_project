@@ -13,34 +13,21 @@ echo: True
 
 <br>
 
-Dataset obtained from an article (Borovecki et al. 2005) about the correlation between the expression of different genes with the development of Huntington's disease.
-
-Dataset content:
-
--   x: Probes IDs and gene expression values of each sample
-
--   y: Diagnosis (symptomatic, control)
-
-The desired output to start working with the dataset is a tibble with tidy data:
-
-1.  Each row is an observation
-2.  Each column is a variable
-3.  Each cell is a single value
-
 </div>
 
 ## Materials and methods
 
-#### Wrangling I Initial tibble
+#### Data Wrangling: From raw to tidydata
 
 <br>
 
-With the data that we had, we created a tibble, where X is now a new column containing the samples from the microarray in order and Y is a new column containing the diagnosis of the patient in that respective sample.
+------------------------------------------------------------------------
 
-Apart from that we have different columns for each sample representing all the genes from each one.
+layout: 2-col
 
-<br>
+------------------------------------------------------------------------
 
+::: column
 ```{r eval=FALSE}
 
 borovecki <- borovecki$x |>
@@ -58,41 +45,25 @@ borovecki <- borovecki |>
     values_to = "expressionValue",
     values_drop_na = TRUE
   )
+
 ```
+:::
+
+::: column
+
+Imagen de la tibble
+:::
 
 ## Materials and methods
 
-####  Wrangling II Pivot_longer
+#### Data Wrangling: From to tidydata
 
-<br>
+---
+layout: 2-col
+---
 
-We make use of the pivot function in order to get all the columns containing the different genes and including them all in the same column called probeID and placing the values from the different probe IDs into a new column called expressionValue.
-
-<br>
-
-```{r eval=FALSE}
-borovecki <- borovecki |>
-  pivot_longer(
-    cols = ends_with("at"),
-    names_to = "probeID", 
-    values_to = "expressionValue",
-    values_drop_na = TRUE
-  )
-```
-
-## Materials and methods
-
-#### Bioconductor
-
-<br>
-
-The hgu133a.db package is useful to handle Affymetrix Human Genome U133A Microarrays as it allows us to do many different annotations.
-
-In our case, thanks to the hgu133a.db package, we were able to annotate all the different probe IDs into real gene names so that the posterior work was done more easily.
-
-<br>
-
-```{r eval=FALSE}
+::: column
+```{r}
 #| message = FALSE
 borovecki <- borovecki |>
   mutate(
@@ -107,21 +78,51 @@ borovecki <- borovecki |>
   filter(!is.na(gene)) |>
   # I specify the package because AnnotationDbi also has a select function
   dplyr::select(-probeID)
-```
 
-## Log2 transformation and categories
+borovecki_geneLevel <- borovecki |>
+  group_by(sample, gene) |>
+  summarise(expression = mean(expression), .groups = "drop")
+
+```
+:::
+
+::: column
+imagen de la tibble
+:::
+
+## Materials and methods
+
+#### Normalization: From messy to tiddy
 
 ![](images/comparison1_raw_log2-05.png){fig-align="center"}
 
-## Linear Modelling (Obtaining gene-level data)
+## Materials and methods
 
-<br>
+#### Linear Modelling 
 
-Let `R` know that we want to work per gene, to do that we define a Linear Model, the analysis requires:
+---
+layout: 2-col
+---
 
--   Tidy data, to obtain it we will pivot the wide format
+::: column
+```{r}
+borovecki_tibble <- borovecki_tibble |>
+  pivot_wider(
+    # Columns not to pivot
+    id_cols = c(sample, diagnosis),
+    # Columns to pivot
+    names_from = gene,
+    values_from = expressionValue
+  ) |>
+  mutate(
+    Diagnosis = case_when(
+      diagnosis == "symptomatic" ~ 1,
+      diagnosis == "control" ~ 0
+    )
+  ) |>
+  dplyr::select(-c(diagnosis,sample)) |>
+  relocate(Diagnosis, .before = 1)
 
-```{r eval=FALSE}
 borovecki_tibble_long <- borovecki_tibble  |> 
   pivot_longer(
     cols = -Diagnosis,
@@ -131,42 +132,46 @@ borovecki_tibble_long <- borovecki_tibble  |>
   mutate(
     log2_expr_level = log2(log2_expr_level)
   )
-```
-
--   Group the tidy data by gene and then add the nest() and ungroup() functions to your pipeline
-
-```{r eval=FALSE}
 borovecki_tibble_long_nested <- borovecki_tibble_long |> 
   group_by(gene) |> 
   nest() |> 
   ungroup()
 ```
+:::
 
-## Fitting the model
+::: column
+imagen de la tibble
+:::
+
+## Materials and methods
+
+#### Linear Modeling
 
 <br>
 
-We created a function that applies a linear model. Applying the function map() to the borovecki_tibble_long_nested *per* gene.
+---
+layout: 2-col
+---
 
-The result is a tibble where each row is a gene with two nested data frames.
-
--   The first one contains multiples rows with (diagnosis + log2_expr_level)
-
--   The second one contains the output of the linear function.
-
-    <br>
-
-```{r eval=FALSE}
-borovecki_tibble_long <- borovecki_tibble  |> 
-  pivot_longer(
-    cols = -Diagnosis,
-    names_to = "gene",
-    values_to = "log2_expr_level"
-  ) |>
-  mutate(
-    log2_expr_level = log2(log2_expr_level)
-  )
+::: column
+```{r}
+by_gene <- borovecki_tibble_long_nested |> 
+  group_by(gene)
+# Define lm function
+linear_model <- function(df) {
+  lm(
+  log2_expr_level ~ Diagnosis , 
+  data = df)
+}
+# Apply lm function to each gene
+borovecki_tibble_long_nested  <- borovecki_tibble_long_nested  |>  
+  mutate(model_object = map(data, linear_model))
 ```
+:::
+
+::: column
+imagen
+:::
 
 ## Results
 

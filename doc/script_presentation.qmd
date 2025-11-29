@@ -32,10 +32,18 @@ The desired output to start working with the dataset is a tibble with tidy data:
 To achieve the tidy data:
 
 1.  Integrate, using the tidyverse library, the two lists into a jointed tibble.
+
 2.  Pivot the columns to obtain a variable called `probeID` accompanied by another called `expressionValue`.
+
 3.  The information is given for the probe IDs, 25-nucleotide sequences that correspond to genes. It is of interest to convert this information to information per gene. The function `mapIds()` was used as annotation library.
+
 4.  Average the expression per gene and sample, using `.groups="drop"` to collapse the multiple rows for the same sample and gene into a unique one.
+
 5.  Save the tidy in another data folder to avoid running this code each time.
+
+6.  With the data that we had, we created a tibble, where X is now a new column containing the samples from the microarray in order and Y is a new column containing the diagnosis of the patient in that respective sample.
+
+    Apart from that we have different columns for each sample representing all the genes from each one.
 
 #### Linear Modelling
 

@@ -50,6 +50,7 @@ borovecki <- borovecki$x |>
     .before = 1, 
     diagnosis = borovecki$y
   )
+
 ```
 
 We will now pivot the columns to obtain a variable called `probeID` accompanied by another called `expressionValue`, together they will summarize the data of the original tibble but in a tidy format

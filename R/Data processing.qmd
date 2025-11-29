@@ -413,7 +413,8 @@ geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
     title = "Gene expression values in control and symptomatic individuals",
     x = "Genes",
     y = "Genes expression"
-  ) +
+  ) + 
+  plot_annotation(caption="Data from: Borovecki et al. 2005")+
   theme(
     plot.title = element_text(size = 12)) 
 
@@ -424,14 +425,13 @@ ggsave(
   dpi = 300,
 )
   
-  
-
-
 ```
 
 #### Violin plots
 
 In order to understand better how the gene expression values change between diagnosis and control individuals, we decided to compare the data using violin plots.
+
+
 
 ```{r}
 HTT_expression_violin <- ggplot(borovecki_grouped |>
@@ -505,7 +505,9 @@ filename = "~/projects/group04_project/results/ZDHHC17_expression_violin.png",
 )
 ```
 
+
 For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
+
 
 ```{r}
 genesExpression_geompoint <- ggplot(borovecki_grouped |>

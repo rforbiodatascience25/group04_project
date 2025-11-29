@@ -3,21 +3,25 @@ title: "Group04 Presentation R4BDS"
 author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
 format: revealjs
 editor: visual
-css: styles.css
-echo: True
 ---
+
+## Content
+Group 04 R for Bio Data Science
+Eric Calaveras
+Sol Escamilla
+Beatriz García
+Lucía López
+Diego Medina
+
+Microarray data processing and visualization
 
 ## Introduction
 
-<div>
-
-Dataset obtained from an article (Borovecki et al. 2005) about the correlation between the expression of different genes with the development of Huntington's disease.
-
 Dataset content:
 
--   x: Probes IDs and gene expression values of each sample
+-   x: probes IDs and  gene expression values of each sample
 
--   y: Diagnosis (symptomatic, control)
+-   y: diagnosis (symptomatic, control)
 
 The desired output to start working with the dataset is a tibble with tidy data:
 
@@ -25,72 +29,19 @@ The desired output to start working with the dataset is a tibble with tidy data:
 2.  Each column is a variable
 3.  Each cell is a single value
 
-</div>
+## Wrangling I: initial tibble
 
-## Materials and methods: Wrangling I: Initial tibble
+Explicar por qué necesitamos agregar sample/diagnosis y convertir a tibble
 
-<br>
+## Wrangling II: Pivot_longer
 
-With the data that we had, we created a tibble, where X is now a new column containing the samples from the microarray in order and Y is a new column containing the diagnosis of the patient in that respective sample.
-
-Apart from that we have different columns for each sample representing all the genes from each one.
-
-<br>
-
-```{r eval=FALSE}
-borovecki <- borovecki$x |>
-  as_tibble() |>
-  mutate(
-    sample = row_number(), 
-    .before = 1, 
-    diagnosis = borovecki$y
-  )
-```
-
-## Materials and methods: Wrangling II: Pivot_longer
-
-<br>
-
-We make use of the pivot function in order to get all the columns containing the different genes and including them all in the same column called probeID and placing the values from the different probe IDs into a new column called expressionValue.
-
-<br>
-
-```{r eval=FALSE}
-borovecki <- borovecki |>
-  pivot_longer(
-    cols = ends_with("at"),
-    names_to = "probeID", 
-    values_to = "expressionValue",
-    values_drop_na = TRUE
-  )
-```
+Explicar que pasar los probes a filas es el paso más importante para tener "tidy data", y por qué esto facilita cualquier análisis despues.
 
 ## Bioconductor
 
-<br>
+Explicar el annotation package
 
-The hgu133a.db package is useful to handle Affymetrix Human Genome U133A Microarrays as it allows us to do many different annotations.
-
-In our case, thanks to the hgu133a.db package, we were able to annotate all the different probe IDs into real gene names so that the posterior work was done more easily.
-
-<br>
-
-```{r eval=FALSE}
-#| message = FALSE
-borovecki <- borovecki |>
-  mutate(
-    gene = mapIds(
-      hgu133a.db, 
-      keys=probeID, 
-      keytype = "PROBEID", 
-      column="SYMBOL",
-      multiVals="first"
-    )
-  ) |>
-  filter(!is.na(gene)) |>
-  # I specify the package because AnnotationDbi also has a select function
-  dplyr::select(-probeID)
-```
+Gracias al paquete hgu133a.db (database) podemos asociar los probes a genes a partir de la columna SYMBOL. (código de Sol)
 
 ## Linear Modelling (Obtaining gene-level data)
 
@@ -155,6 +106,7 @@ borovecki_tibble_long <- borovecki_tibble  |>
 
 ## Log2 transformation and categories
 
+
 Almost all values are concentrated near zero, while one or a few values reach very high levels.This makes it nearly impossible to interpret the distribution or compare expression between genes. To address this, we apply a log2 transformation to the expression values.
 
 This transformation serves five purposes:
@@ -171,12 +123,15 @@ This transformation serves five purposes:
 
 ## Visualization 1
 
+
 ```{r, echo=FALSE}
 
 
 ```
 
 ## Visualization 2
+
+
 
 ## Discussion
 

@@ -10,6 +10,7 @@ format: html
 library(tidyverse)
 library(fs)
 library(patchwork)
+library(dplyr)
 
 ```
 
@@ -97,28 +98,68 @@ borovecki_data |>
 
 ```{r}
 #| message = FALSE
+
+#fill function
+fill_scale <- scale_fill_manual(
+  name   = NULL,
+  values = c("Raw data" = "blue",
+             "Log2 data" = "purple")
+)
 # Comparison between raw data and log2 data
-raw_histogram <- ggplot(borovecki_data, aes(x = expressionValue)) +
-  geom_histogram(bins = 50, fill = "blue", alpha = 0.6) +
+raw_histogram <- ggplot(borovecki_data, aes(x = expressionValue,fill = "Raw data")) +
+  geom_histogram(bins = 50, alpha = 0.6) +
+  fill_scale+
   theme_minimal(base_size = 14) +
-  labs(title = "Raw data",
-       x = "Expression value",
+  labs(x = "Expression value",
        y = "Count") +
   theme(plot.title = element_text(size = 13, 
                                   hjust = 0.5)) 
 
-log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression)) +
-  geom_histogram(bins = 100, fill = "purple", alpha = 0.6) +
+log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression,  fill = "Log2 data")) +
+  geom_histogram(bins = 100, alpha = 0.6) +
+  fill_scale +
   theme_minimal(base_size = 14) +
-  labs(title = "Transformed data",
-       x = "log2(Expression value)",
+  labs(x = "log2(Expression value)",
        y = "Count") +
   theme(plot.title = element_text(size = 13,
                                   hjust = 0.5))
 
+#Calculate max from Y axis (ExpressionValue)
+#raw_hist_counts <- borovecki_data |>
+#  select(expressionValue) |>
+#  mutate(bin = cut(expressionValue, breaks = 50)) |>
+#  count(bin, name = "count")
+
+#max_raw <- raw_hist_counts |>
+#  summarise(max(count)) |>
+#  pull()
+
+#Calculate max from Y axis (Log2_expression)
+#log_hist_counts <- borovecki_data |>
+#  select(log2_expression) |>
+#  mutate(bin = cut(log2_expression, breaks = 100)) |>
+#  count(bin, name = "count")
+
+#max_log <- log_hist_counts |>
+#  summarise(max(count)) |>
+#  pull()
+
+#Claculate commun max
+#max_y <- max(max_raw, max_log)
+
+#Add limit to the histograms
+#raw_histogram  <- raw_histogram  + ylim(0, max_y)
+#log2_histogram <- log2_histogram + ylim(0, max_y)
+
+
+#Plot histograms
 raw_histogram + log2_histogram + 
+  plot_layout(guides = "collect")+
   plot_annotation(title="Comparison between Raw and Log2-Transformed Expression Data", 
-                  caption="Data from: Borovecki et al. 2005")
+                  caption="Data from: Borovecki et al. 2005") &
+  theme(legend.position = "right")
+  
+
 
 ggsave(
   filename = "~/projects/group04_project/results/comparison1_raw_log2.png", 
@@ -345,7 +386,7 @@ genes_info <- genes_relevant |>
 ```
 
 ```{r}
-Comparison_of_HTT_vs_MHL1_Expression <- ggplot(genes_info, aes(x = HTT, y = MLH1)) +
+ggplot(genes_info, aes(x = HTT, y = MLH1)) +
   geom_point(alpha = 0.6) +
   geom_smooth() +
   labs(
@@ -353,12 +394,7 @@ Comparison_of_HTT_vs_MHL1_Expression <- ggplot(genes_info, aes(x = HTT, y = MLH1
     x = "HTT expression",
     y = "MHL1 expression"
   ) 
-ggsave(
-  filename = "~/projects/group04_project/results/Comparison_of_HTT_vs_MHL1_Expression.png",
-  plot = Comparison_of_HTT_vs_MHL1_Expression,
-  device = "png",
-  dpi = 300,
-)
+
 ```
 
 The relationship between genes is weak and slightly negative, smoothing line slopes down as HTT expression increases.
@@ -381,7 +417,7 @@ genes_info2 <- genes_relevant2 |>
 ```
 
 ```{r}
-Comparison_of_HTT_vs_PMS1_Expression <- ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
+ggplot(genes_info2, aes(x = HTT, y = PMS1)) +
   geom_point(alpha = 0.6) +
   geom_smooth() +
   labs(
@@ -389,12 +425,7 @@ Comparison_of_HTT_vs_PMS1_Expression <- ggplot(genes_info2, aes(x = HTT, y = PMS
     x = "HTT expression",
     y = "PMS1 expression"
   ) 
-ggsave(
-  filename = "~/projects/group04_project/results/Comparison_of_HTT_vs_PMS1_Expression.png",
-  plot = Comparison_of_HTT_vs_PMS1_Expression,
-  device = "png",
-  dpi = 300,
-)
+
 ```
 
 ## Data Visualization II
@@ -583,25 +614,33 @@ borovecki_data |>
 Repair genes expression level boxplot
 
 ```{r}
+#| message = FALSE
 dnarepair_genes <- c("PMS1", "FAN1", "LIG1", "MLH1", "MSH3", "PMS2")
 
 dnarepair_data<- borovecki_data|>
   filter(gene %in% dnarepair_genes)
 
-dnarepair_plot<-dnarepair_data|>
-  ggplot(aes(x = log2_expression, 
+
+Expression_of_DNA_repair_genes_vs_clinical_outcome <- ggplot(dnarepair_data, aes(x = log2_expression, 
              y = gene, 
              fill = diagnosis))+
-  geom_boxplot(alpha = 0.4, width = 0.6, outlier.shape = NA)+
+  geom_boxplot(alpha = 0.4, outlier.shape = NA)+
   labs(
     x = "Expression level",
     y = "Genes",
-    title = "Expression of DNA repair genes vs clinical outcome"
+    title = "Expression of DNA repair genes vs clinical outcome",
+    caption="Data from: Borovecki et al. 2005"
   ) +
   theme_minimal() +
-  theme(legend.position = "none")
-dnarepair_plot
+  theme(legend.position = "right ")
 
+
+ggsave(
+  filename = "~/projects/group04_project/results/Expression_of_DNA_repair_genes_vs_clinical_outcome.png",
+  plot = Expression_of_DNA_repair_genes_vs_clinical_outcome,
+  device = "png",
+  dpi = 300,
+)
              
 ```
 
@@ -622,6 +661,8 @@ ggplot(genes_wider, aes(x = ZNF675, y = HBA1)) +
     y = "HBA1 expression"
   ) +
   theme_minimal()
+
+
 ```
 
 ```{r}
@@ -640,9 +681,11 @@ ggplot(genes_wide4, aes(x = HTT, y = LIG1)) +
     x = "HTT expression",
     y = "LIG1 expression"
   ) 
+
 ```
 
 ```{r}
+#| message = FALSE
 genes_relevant1 <- borovecki_data |>
   filter(gene %in% c("HTT", "MLH1"))
 
@@ -650,17 +693,29 @@ genes_wide1 <- genes_relevant1 |>
   select(sample, gene, log2_expression) |>
   pivot_wider(names_from = gene, values_from = log2_expression)
 
-ggplot(genes_wide1, aes(x = HTT, y = MLH1)) +
+Comparison_of_HTT_vs_MHL1_Expression <- ggplot(genes_wide1, aes(x = HTT, y = MLH1)) +
   geom_point(alpha = 0.6) +
   geom_smooth() +
   labs(
     title = "Comparison of HTT vs MHL1 Expression",
     x = "HTT expression",
-    y = "MHL1 expression"
+    y = "MHL1 expression",
+    caption="Data from: Borovecki et al. 2005"
   ) 
+
+Comparison_of_HTT_vs_MHL1_Expression 
+
+ggsave(
+  filename = "~/projects/group04_project/results/Comparison_of_HTT_vs_MHL1_Expression.png",
+  plot = Comparison_of_HTT_vs_MHL1_Expression,
+  device = "png",
+  dpi = 300,
+)
+
 ```
 
 ```{r}
+#| message = FALSE
 genes_Relevant <- borovecki_data |>
   filter(gene %in% c("HTT", "PMS1"))
 
@@ -668,14 +723,22 @@ genes_wide3 <- genes_Relevant |>
   select(sample, gene, log2_expression) |>
   pivot_wider(names_from = gene, values_from = log2_expression)
 
-ggplot(genes_wide3, aes(x = HTT, y = PMS1)) +
+Comparison_of_HTT_vs_PMS1_Expression <- ggplot(genes_wide3, aes(x = HTT, y = PMS1)) +
   geom_point(alpha = 0.6) +
   geom_smooth() +
   labs(
     title = "Comparison of HTT vs PMS1 Expression",
     x = "HTT expression",
-    y = "PMS1 expression"
+    y = "PMS1 expression",
+    caption="Data from: Borovecki et al. 2005"
   ) 
+Comparison_of_HTT_vs_PMS1_Expression 
+ggsave(
+  filename = "~/projects/group04_project/results/Comparison_of_HTT_vs_PMS1_Expression.png",
+  plot = Comparison_of_HTT_vs_PMS1_Expression,
+  device = "png",
+  dpi = 300,
+)
 ```
 
 There is a significant change in the Data Visualization I part I and Data Visualization I part II. This is because we have applied log2 normalization in gene expression so the data is compressed allowing a better comparison between genes and a more normal-like distribution. In the second plots we lose outliers influence, the variation becomes more uniform and the trend line becomes more stable. All this improvements reflect the biological trends more reliably.

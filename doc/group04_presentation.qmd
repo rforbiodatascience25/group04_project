@@ -171,6 +171,8 @@ This transformation serves five purposes:
 
 ## Visualization 1
 
+![](images/Comparison_of_HTT_vs_MHL1_Expression.png){width="2154" height="120"}
+
 ```{r, echo=FALSE}
 
 

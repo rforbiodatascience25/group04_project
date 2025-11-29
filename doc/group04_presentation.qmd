@@ -43,22 +43,83 @@ Explicar el annotation package
 
 Gracias al paquete hgu133a.db (database) podemos asociar los probes a genes a partir de la columna SYMBOL. (código de Sol)
 
-## Obtaining gene-level data
+## Linear Modelling (Obtaining gene-level data)
 
-Que se vea cómo varios probes de un mismo gen se colapsan en un solo valor promediando.
+<br>
 
-Explicar que en microarrays varios probes mapean a un mismo gen, reduciendo ruido y facilitando hacer estudios.
+Let `R` know that we want to work per gene, to do that we define a Linear Model, the analysis requires:
+
+-   Tidy data, to obtain it we will pivot the wide format
+
+<br>
+
+```{r eval=FALSE}
+borovecki_tibble_long <- borovecki_tibble  |> 
+  pivot_longer(
+    cols = -Diagnosis,
+    names_to = "gene",
+    values_to = "log2_expr_level"
+  ) |>
+  mutate(
+    log2_expr_level = log2(log2_expr_level)
+  )
+```
+
+<br>
+
+-   Group the tidy data by `gene` and then add the `nest()` and `ungroup()` functions to your pipeline
+
+<br>
+
+```{r eval=FALSE}
+borovecki_tibble_long_nested <- borovecki_tibble_long |> 
+  group_by(gene) |> 
+  nest() |> 
+  ungroup()
+```
+
+## Fitting the model
+
+<br>
+
+We created a function that applies a linear model. Applying the function `map()` to the `borovecki_tibble_long_nested` *per* gene.
+
+The result is a **`<tibble [13,039× 3]>`** where each row is a gene with two nested data frames.
+
+-   The first one contains multiples rows with (diagnosis + log2_expr_level)
+
+-   The second one contains the output of the linear function.
+
+    <br>
+
+```{r eval=FALSE}
+borovecki_tibble_long <- borovecki_tibble  |> 
+  pivot_longer(
+    cols = -Diagnosis,
+    names_to = "gene",
+    values_to = "log2_expr_level"
+  ) |>
+  mutate(
+    log2_expr_level = log2(log2_expr_level)
+  )
+```
 
 ## Log2 transformation and categories
 
-Poner en la diapo:
-- gráfico del antes/despues
-- distribución raw vs log2
 
-Explicar: 
-- Log2 reduce la diferencia entre valores bajos y altos.
-- Mejora visualización y normaliza la escala.
-- Explicar por qué aparecen valores negativos.
+Almost all values are concentrated near zero, while one or a few values reach very high levels.This makes it nearly impossible to interpret the distribution or compare expression between genes. To address this, we apply a log2 transformation to the expression values.
+
+This transformation serves five purposes:
+
+1.  Normalise the distribution, reducing the influence of extremely large values.
+
+2.  Spread out lower values, making subtle differences more interpretable.
+
+3.  Better comparison between genes and a more normal-like distribution.
+
+4.  We lose outliers influence, the variation becomes more uniform and the trend line becomes more stable.
+
+5.  All this improvements reflect the biological trends more reliably.
 
 ## Visualization 1
 

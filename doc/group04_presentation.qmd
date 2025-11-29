@@ -29,7 +29,9 @@ The desired output to start working with the dataset is a tibble with tidy data:
 
 </div>
 
-## Materials and methods: Wrangling I: Initial tibble
+## Materials and methods
+
+#### Wrangling I Initial tibble
 
 <br>
 
@@ -40,6 +42,7 @@ Apart from that we have different columns for each sample representing all the g
 <br>
 
 ```{r eval=FALSE}
+
 borovecki <- borovecki$x |>
   as_tibble() |>
   mutate(
@@ -47,9 +50,19 @@ borovecki <- borovecki$x |>
     .before = 1, 
     diagnosis = borovecki$y
   )
+
+borovecki <- borovecki |>
+  pivot_longer(
+    cols = ends_with("at"),
+    names_to = "probeID", 
+    values_to = "expressionValue",
+    values_drop_na = TRUE
+  )
 ```
 
-## Materials and methods: Wrangling II: Pivot_longer
+## Materials and methods
+
+####  Wrangling II Pivot_longer
 
 <br>
 
@@ -67,7 +80,9 @@ borovecki <- borovecki |>
   )
 ```
 
-## Bioconductor
+## Materials and methods
+
+#### Bioconductor
 
 <br>
 
@@ -93,6 +108,10 @@ borovecki <- borovecki |>
   # I specify the package because AnnotationDbi also has a select function
   dplyr::select(-probeID)
 ```
+
+## Log2 transformation and categories
+
+![](images/comparison1_raw_log2-05.png){fig-align="center"}
 
 ## Linear Modelling (Obtaining gene-level data)
 
@@ -149,36 +168,17 @@ borovecki_tibble_long <- borovecki_tibble  |>
   )
 ```
 
-## Log2 transformation and categories
+## Results
 
-![](images/comparison1_raw_log2-01.png){fig-align="center"}
+<br>
 
-## Visualization
+![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome.png){fig-align="center"}
 
-![](images/geneExpression_comparison_boxplot.png){fig-align="center" width="2100"}
+## Results
 
-<<<<<<< HEAD
-2.  Spread out lower values, making subtle differences more interpretable.
+<br>
 
-3.  Better comparison between genes and a more normal-like distribution.
-
-4.  We lose outliers influence, the variation becomes more uniform and the trend line becomes more stable.
-
-5.  All this improvements reflect the biological trends more reliably.
-
-## Visualization 1
-
-![](images/Comparison_of_HTT_vs_MHL1_Expression.png){width="2154" height="120"}
-
-```{r, echo=FALSE}
-
-
-```
-
-## Visualization 2
-=======
-## Visualization
->>>>>>> b53aa0125efddb4abe4066a56ba6eaec41955ee6
+![](images/forest-02.png){fig-align="center"}
 
 ## Discussion
 

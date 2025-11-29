@@ -153,11 +153,11 @@ borovecki_tibble_long <- borovecki_tibble  |>
 
 ![](images/comparison1_raw_log2-01.png){fig-align="center"}
 
-## Visualization 
+## Visualization
 
 ![](images/geneExpression_comparison_boxplot.png){fig-align="center" width="2100"}
 
-## Visualization 
+## Visualization
 
 ## Discussion
 

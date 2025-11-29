@@ -11,6 +11,8 @@ echo: True
 
 <div>
 
+<br>
+
 Dataset obtained from an article (Borovecki et al. 2005) about the correlation between the expression of different genes with the development of Huntington's disease.
 
 Dataset content:
@@ -100,8 +102,6 @@ Let `R` know that we want to work per gene, to do that we define a Linear Model,
 
 -   Tidy data, to obtain it we will pivot the wide format
 
-<br>
-
 ```{r eval=FALSE}
 borovecki_tibble_long <- borovecki_tibble  |> 
   pivot_longer(
@@ -114,11 +114,7 @@ borovecki_tibble_long <- borovecki_tibble  |>
   )
 ```
 
-<br>
-
--   Group the tidy data by `gene` and then add the `nest()` and `ungroup()` functions to your pipeline
-
-<br>
+-   Group the tidy data by gene and then add the nest() and ungroup() functions to your pipeline
 
 ```{r eval=FALSE}
 borovecki_tibble_long_nested <- borovecki_tibble_long |> 
@@ -131,9 +127,9 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 
 <br>
 
-We created a function that applies a linear model. Applying the function `map()` to the `borovecki_tibble_long_nested` *per* gene.
+We created a function that applies a linear model. Applying the function map() to the borovecki_tibble_long_nested *per* gene.
 
-The result is a **`<tibble [13,039× 3]>`** where each row is a gene with two nested data frames.
+The result is a tibble where each row is a gene with two nested data frames.
 
 -   The first one contains multiples rows with (diagnosis + log2_expr_level)
 
@@ -155,12 +151,13 @@ borovecki_tibble_long <- borovecki_tibble  |>
 
 ## Log2 transformation and categories
 
-Almost all values are concentrated near zero, while one or a few values reach very high levels.This makes it nearly impossible to interpret the distribution or compare expression between genes. To address this, we apply a log2 transformation to the expression values.
+![](images/comparison1_raw_log2-01.png){fig-align="center"}
 
-This transformation serves five purposes:
+## Visualization
 
-1.  Normalise the distribution, reducing the influence of extremely large values.
+![](images/geneExpression_comparison_boxplot.png){fig-align="center" width="2100"}
 
+<<<<<<< HEAD
 2.  Spread out lower values, making subtle differences more interpretable.
 
 3.  Better comparison between genes and a more normal-like distribution.
@@ -179,7 +176,16 @@ This transformation serves five purposes:
 ```
 
 ## Visualization 2
+=======
+## Visualization
+>>>>>>> b53aa0125efddb4abe4066a56ba6eaec41955ee6
 
 ## Discussion
 
-Gracias a usar todas estas herramientas hemos podido encontrar genes mas singnificativos e importantes en esta enfermedad
+<br>
+
+The use of different functions in RStudio has allowed us to modify the initial raw dataset making it tidy so that we could work with it. By doing that, it became easier for us to see the genes that were more differentially expressed between patients with HD and control. Also, bibliography reading was used to get information about the genes implied in the development of the disease. Combining our tidy data with the bibliography, allowed us to see the difference in the expressions by applying different plots.
+
+<br>
+
+This methodology could also be translated for other diseases in the future, creating bonds between hospitals and bioinformaticians to use the data they obtain to give us a better understanding of how different diseases work and express themselves by regulating their gene expression.

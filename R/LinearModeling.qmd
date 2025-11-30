@@ -242,7 +242,7 @@ forest
 
 ggsave(
   filename = "~/projects/group04_project/results/forest.png", 
-  plot = top30,                                     
+  plot = forest,                                     
   device = "png",                               
   dpi = 300   # Resolution
 )
@@ -268,7 +268,7 @@ volcano
 
 ggsave(
   filename = "~/projects/group04_project/results/volcano.png", 
-  plot = top30,                                     
+  plot = top10,                                     
   device = "png",                               
   dpi = 300   # Resolution
 )

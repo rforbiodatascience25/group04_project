@@ -1,11 +1,16 @@
 ---
 title: "Group04 Presentation R4BDS"
 author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
-format: revealjs
 editor: visual
-css: styles.css
-echo: True
+echo: true
+
+format:
+  revealjs:
+    css: styles.css
+    background-color: "#CCE6FF"
 ---
+
+
 
 ## Introduction
 
@@ -80,7 +85,7 @@ borovecki_geneLevel <- borovecki |>
 
 ## Materials and methods
 
-#### Normalization: From raw to standardize  data
+#### Normalization: From raw to standardize data
 
 ![](images/comparison1_raw_log2-05.png){fig-align="center"}
 
@@ -130,11 +135,11 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 :::
 
 ::: column
-![](images/Borovecki_tibble.png){width="500"}
+![](images/Borovecki_tibble.png){fig-align="center" width="500"}
 
-![](images/borovecki__tibble_long.png){width="500"}
+![](images/borovecki__tibble_long.png){fig-align="center" width="400"}
 
-![](images/borovecki_tibble_long_nested_prelm.png){width="500"}
+![](images/borovecki_tibble_long_nested_prelm.png){fig-align="center" width="300"}
 :::
 
 ## Materials and methods
@@ -181,49 +186,127 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 :::
 
 ::: column
-![](images/borovecki_tibble_long_nested.png)
+![](images/borovecki_tibble_long_nested.png){fig-align="right"}
 
-![](images/borovecki_estimate.png)
+![](images/borovecki_estimate.png){fig-align="right"}
 :::
 
 ## Results
 
 #### Dataset exploration in established genetic modifiers
 
-![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center"}
+<br>
 
+---
+layout: 2-col
+---
+::: {.column}
+
+```{r eval=FALSE}
+geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
+  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Gene expression values in control and symptomatic individuals",
+    x = "Genes",
+    y = "Genes expression"
+  ) +
+  theme(
+    plot.title = element_text(size = 12)) 
+
+```
+:::
+::: {.column}
+![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center"}
+:::
 ## Results
 
 #### Forest Plot
 
 <br>
 
-![](images/forest-04.png){fig-align="center"}
+---
+layout: 2-col
+---
+
+::: {.column}
+
+```{r eval=FALSE}
+forest <- borovecki_estimates |> 
+  filter(is_significant == "yes") |> 
+  arrange(p.value) |> 
+  slice_head(n = 30) |> 
+  mutate(
+    gene=fct_reorder(gene, estimate)
+  ) |> 
+  ggplot(aes(x=estimate, y=gene))+
+  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high)) +   
+  geom_point() +
+  labs(
+    title = "Genes Associated with hungington disease",
+    x = "Estimates (95%CIs)",
+    y = NULL
+  ) +
+  theme_minimal() 
+
+```
+
+
+:::
+::: {.column}
+
+![](images/forest-02.png){fig-align="center"}
+
+:::
 
 ## Results
 
 #### Volcano Plot
 
 <br>
+---
+layout: 2-col
+---
+::: {.column}
+```{r eval=FALSE}
+volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
+  geom_point(aes(color=is_significant, label=lbl), alpha=0.5, size=1) +
+  geom_text_repel(aes(color=is_significant, label = lbl), size = 2, max.overlaps = Inf) +
+  labs(
+    title = "Genes Associated with hungington disease",
+    subtitle = "Genes highlighted in turquoise were significant after multiple testing correction",
+    x = "Estimates",
+    y = "-log10(p)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+```
+:::
+
+::: {.column}
+
 
 ![](images/volcano-01.png){fig-align="center"}
+:::
 
 ## Discussion
 
 <br>
 
--   Use of different functions in RStudio allowed us to tidy the initial raw dataset to work with it.
+**Bioinformatics** is an **essential** tool in modern biological research.
 
--   Combining our tidy data with the bibliography, allowed us to see the difference in the expressions by applying different plots.
+<br>
 
-    <br>
+[Data wrangling]{.underline}
 
-    #### Future perspectives
+: Chaos -> Biologically interpretable structure
 
-    <br>
+[Statistical analysis + Data visualisation]{.underline}
 
--   This methodology could be translated for other diseases in the future.
+: Reveal key signals
 
--   More collaboration between hospitals and bioinformaticians to use the data they obtain in order to get a better understanding of how different diseases work.
+<br>
 
-    #### 
+**Collaboration** between scientists and bioinformaticians allows for a better understanding of how **diseases** work

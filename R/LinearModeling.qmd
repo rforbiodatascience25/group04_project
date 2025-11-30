@@ -268,7 +268,7 @@ volcano
 
 ggsave(
   filename = "~/projects/group04_project/results/volcano.png", 
-  plot = top10,                                     
+  plot = volcano,                                     
   device = "png",                               
   dpi = 300   # Resolution
 )

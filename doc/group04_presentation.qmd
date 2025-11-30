@@ -295,6 +295,7 @@ volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) +
 
 <br>
 
+<<<<<<< HEAD
 **Bioinformatics** is an **essential** tool in modern biological research.
 
 <br>
@@ -309,4 +310,17 @@ volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) +
 
 <br>
 
+=======
+**Bioinformatics** is an essential tool in modern biological research
+
+<br>
+* Data wrangling
+    * Chaos $\rightarrow$ Biologically interpretable structure
+<br>
+* Statistical analysis + Data visualisation
+    * Reveal key signals
+
+<br>
+
+>>>>>>> d7a2c6ac43d347d6ef9f97d92ed516cc3e82415d
 **Collaboration** between scientists and bioinformaticians allows for a better understanding of how **diseases** work

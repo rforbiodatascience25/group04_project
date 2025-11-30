@@ -1,5 +1,5 @@
 ---
-title: "lab06_exercises"
+title: "Linear modeling"
 format:
   html:
     embed-resources: true
@@ -173,11 +173,30 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
           is_significant = case_when(
             q.value >= 0.05 ~ "no",
             q.value < 0.05 ~ "yes"
-            ),
-         lbl = case_when(
-           q.value < 0.05 ~ gene,
-           q.value >= 0.05 ~ "")
+            )
          )
+
+```
+I will create a label for the top 10 potential genes with a formula that combines the estimate and the pvalue (Formula from System Biology class)
+
+```{r}
+borovecki_estimates <- borovecki_estimates |>
+  mutate(
+    score_fc = -log10(p.value) * sign(log2(estimate))
+  )
+
+top_10_genes <- borovecki_estimates |>
+  arrange(desc(abs(score_fc))) |>
+  slice_head(n = 10) |>
+  pull(gene)
+
+borovecki_estimates <- borovecki_estimates |>
+  mutate(
+    top10 = case_when(
+      gene %in% top_10_genes ~ gene,
+      TRUE ~ ""
+    ))
+
 ```
 
 Next, we save the object into our data folder
@@ -234,8 +253,8 @@ Let's see, plot and save the most deferentially expressed genes with a forest pl
 ```{r}
 #| message = FALSE
 volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
-  geom_point(aes(color=is_significant, label=lbl), alpha=0.5, size=1) +
-  geom_text_repel(aes(color=is_significant, label = lbl), size = 2, max.overlaps = Inf) +
+  geom_point(aes(color=is_significant, label=top10), alpha=0.5, size=1) +
+  geom_text_repel(aes(color=is_significant, label = top10), size = 2, max.overlaps = Inf) +
   labs(
     title = "Genes Associated with hungington disease",
     subtitle = "Genes highlighted in turquoise were significant after multiple testing correction",

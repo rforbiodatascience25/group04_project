@@ -19,7 +19,7 @@ echo: True
 
 ## Materials and methods
 
-#### Data Wrangling: From raw to tidydata
+#### Data Wrangling: From messy to tidy data
 
 <br>
 
@@ -50,7 +50,7 @@ borovecki <- borovecki |>
 
 ## Materials and methods
 
-#### Data Wrangling: From raw to tidydata
+#### Data Wrangling: From messy to tidy data
 
 ---
 layout: 2-col
@@ -80,7 +80,7 @@ borovecki_geneLevel <- borovecki |>
 
 ## Materials and methods
 
-#### Normalization: From messy to tidy
+#### Normalization: From raw to standardize  data
 
 ![](images/comparison1_raw_log2-05.png){fig-align="center"}
 

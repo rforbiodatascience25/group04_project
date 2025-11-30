@@ -212,18 +212,15 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 
 <br>
 
--   Use of different functions in RStudio allowed us to tidy the initial raw dataset to work with it.
+**Bioinformatics** is an essential tool in modern biological research
 
--   Combining our tidy data with the bibliography, allowed us to see the difference in the expressions by applying different plots.
+<br>
+* Data wrangling
+    * Chaos $\rightarrow$ Biologically interpretable structure
+<br>
+* Statistical analysis + Data visualisation
+    * Reveal key signals
 
-    <br>
+<br>
 
-    #### Future perspectives
-
-    <br>
-
--   This methodology could be translated for other diseases in the future.
-
--   More collaboration between hospitals and bioinformaticians to use the data they obtain in order to get a better understanding of how different diseases work.
-
-    #### 
+**Collaboration** between scientists and bioinformaticians allows for a better understanding of how **diseases** work

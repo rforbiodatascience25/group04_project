@@ -38,7 +38,7 @@ Before applying any transformation, it is important to inspect the distribution 
 ```{r}
 #| message = FALSE
 # Histogram of raw expression values 
-raw_data1 <- ggplot(borovecki_data, aes(x = expressionValue)) +   
+raw_data1 <- ggplot(borovecki_tibble, aes(x = expressionValue)) +   
   geom_histogram(bins = 50, 
                  fill = "blue", 
                  alpha = 0.6) +   
@@ -64,7 +64,7 @@ This plot shows that the raw expression values are extremely skewed. Almost all 
 
 ```{r}
 # Getting min and max values of raw data
-borovecki_data |>
+borovecki_tibble |>
   summarise(min_exp = min(expressionValue),
             max_exp = max(expressionValue))
 ```
@@ -375,11 +375,12 @@ ggsave(
   device = "png",
   dpi = 300,
 )
-  
-  
-
 
 ```
+
+This plot compares the expression levels of several genes that have been previously associated with Huntington's disease according to the literature. We wanted to evaluate if this is also reflected in our data set by examining differences in gene expression values between control individuals and symptomatic individuals.
+The plot allows us to visually assess whether symptomatic individuals show higher or lower gene expression levels compared to control individuals.
+Overall, we can observe a shift in expression values between control and symptomatic individuals, which matches what found in literature.
 
 #### Violin plots
 

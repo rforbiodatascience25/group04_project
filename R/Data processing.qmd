@@ -113,7 +113,9 @@ raw_histogram <- ggplot(borovecki_data, aes(x = expressionValue,fill = "Raw data
   labs(x = "Expression value",
        y = "Count") +
   theme(plot.title = element_text(size = 13, 
-                                  hjust = 0.5)) 
+                                  hjust = 0.5),
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    legend.position = "bottom")
 
 log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression,  fill = "Log2 data")) +
   geom_histogram(bins = 100, alpha = 0.6) +
@@ -121,8 +123,10 @@ log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression,  fill = "Log2 
   theme_minimal(base_size = 14) +
   labs(x = "log2(Expression value)",
        y = "Count") +
-  theme(plot.title = element_text(size = 13,
-                                  hjust = 0.5))
+  theme(plot.title = element_text(size = 13, 
+                                  hjust = 0.5),
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    legend.position = "bottom")
 
 #Calculate max from Y axis (ExpressionValue)
 #raw_hist_counts <- borovecki_data |>
@@ -378,9 +382,7 @@ ggsave(
 
 ```
 
-This plot compares the expression levels of several genes that have been previously associated with Huntington's disease according to the literature. We wanted to evaluate if this is also reflected in our data set by examining differences in gene expression values between control individuals and symptomatic individuals.
-The plot allows us to visually assess whether symptomatic individuals show higher or lower gene expression levels compared to control individuals.
-Overall, we can observe a shift in expression values between control and symptomatic individuals, which matches what found in literature.
+This plot compares the expression levels of several genes that have been previously associated with Huntington's disease according to the literature. We wanted to evaluate if this is also reflected in our data set by examining differences in gene expression values between control individuals and symptomatic individuals. The plot allows us to visually assess whether symptomatic individuals show higher or lower gene expression levels compared to control individuals. Overall, we can observe a shift in expression values between control and symptomatic individuals, which matches what found in literature.
 
 #### Violin plots
 

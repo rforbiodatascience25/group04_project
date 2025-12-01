@@ -47,22 +47,6 @@ group04_project.Rproj -\> RStudio project file for easy navigation and reproduci
 
 
 
-### Contributing:
-
-The processed data set can be used by other users to try to find more correlations, plotting them or making them into a tibble with the desired data. Also, to fix possible errors or bugs found in the code or suggest some new ideas.
-
-In order to do so, the user should:
-
-##### 1- Fork the repository
-
-##### 2- Open a new branch of its own
-
-##### 3- Commit its changes
-
-##### 4- Push them to the branch
-
-##### 5- Open a pull request
-
 ### Contact:
 
 In case there are any issues with the project, do not hesitate to contact any of the authors of the project via e-mail.

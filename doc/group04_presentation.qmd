@@ -51,6 +51,9 @@ borovecki <- borovecki |>
 ```
 :::
 
+::: column
+:::
+
 ## Materials and methods
 
 #### Data Wrangling: From messy to tidy data
@@ -88,7 +91,6 @@ borovecki_geneLevel <- borovecki |>
 :::
 
 ::: column
-![](images/comparison1_raw_log2-06.png){fig-align="center"}
 :::
 
 ## Materials and methods
@@ -130,6 +132,10 @@ raw_histogram + log2_histogram +
                   caption="Data from: Borovecki et al. 2005") &
   theme(legend.position = "right")
 ```
+:::
+
+::: column
+![](images/comparison1_raw_log2-07.png){fig-align="center"}
 :::
 
 ## Materials and methods
@@ -221,11 +227,7 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
           is_significant = case_when(
             q.value >= 0.05 ~ "no",
             q.value < 0.05 ~ "yes"
-            ),
-         lbl = case_when(
-           q.value < 0.05 ~ gene,
-           q.value >= 0.05 ~ "")
-         )
+            )
 ```
 :::
 
@@ -337,19 +339,13 @@ volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) +
 
 <br>
 
-[Data wrangling]{.underline}
+ [Data wrangling]{.underline}
 
 :   Chaos -\> Biologically interpretable structure
 
-[Statistical analysis + Data visualisation]{.underline}
+ [Statistical analysis + Data visualisation]{.underline}
 
 :   Reveal key signals
-
-<br>
-
-**Bioinformatics** is an essential tool in modern biological research
-
-<br> \* Data wrangling \* Chaos $\rightarrow$ Biologically interpretable structure <br> \* Statistical analysis + Data visualisation \* Reveal key signals
 
 <br>
 

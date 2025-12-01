@@ -11,6 +11,7 @@ library(tidyverse)
 library(fs)
 library(patchwork)
 library(dplyr)
+library(here)
 
 ```
 
@@ -281,9 +282,9 @@ borovecki_grouped |>
 
 We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1)
 
-## Data Visualization I
+## Data Visualization
 
-```{r}
+```{r Boxplot comparison of raw data and log2 expression}
 
 Expression_value_vs_log2Expression <- ggplot(data = borovecki_tibble, aes(x= diagnosis, y = expressionValue)) +
   geom_boxplot() +
@@ -302,19 +303,19 @@ ggsave(
   
 ```
 
-```{r}
+```{r Most expressed gene}
 
 borovecki_tibble |>
   slice_max(expressionValue, n = 1)
 ```
 
-```{r}
+```{r Less expressed gene}
 
 borovecki_tibble |>
   slice_min(expressionValue, n = 1)
 ```
 
-```{r}
+```{r Boxplot o the most expressed gene}
 borovecki_grouped |>
   filter(gene == "HBA1") |>
   ggplot(aes(x = gene, y = log2_expression, color = diagnosis)) +
@@ -326,7 +327,7 @@ borovecki_grouped |>
   )
 ```
 
-```{r}
+```{r Boxplot of the less expressed gene}
 borovecki_grouped |>
   filter(gene == "ZNF675") |>
   ggplot(aes(x = gene, y = log2_expression, color = diagnosis)) +
@@ -338,20 +339,7 @@ borovecki_grouped |>
   )
 ```
 
-```         
-```
-
-```         
-```
-
-## Data Visualization II
-
-```{r}
-library("tidyverse")
-library("here")
-```
-
-```{r}
+```{r Boxplot of the most expressed genes found in the library}
 geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
   filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
   geom_boxplot() +
@@ -379,7 +367,7 @@ This plot compares the expression levels of several genes that have been previou
 
 In order to understand better how the gene expression values change between diagnosis and control individuals, we decided to compare the data using violin plots.
 
-```{r}
+```{r Violin plot of HTT gene expression}
 HTT_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "HTT"), aes(diagnosis, log2_expression, fill = diagnosis)) +
   geom_violin() +
@@ -402,9 +390,9 @@ ggsave(
 
 ```
 
-For HTT gene, symptomatic patientes tend to show a lower gene expression level compared to control patients. This is particularly interesting, because HTT is the key gene involved in Huntington's disease. https://www.uniprot.org/uniprotkb/P42858/entry
+Huntington's disease is caused by CAG repeat in the HTT gene. Recent genome-wide Association studies (GWASs) have identified genetic modifiers that influence average age of onset in the disease, among the modifiers several genes related to DNA mismatch repair *FAN1*, *LIG1*, *MLH1*, *MSH3*, *PMS1* and *PMS2*,7 which are thought to impact the somatic expansion of the CAG repeat in vulnerable neural cell types.
 
-```{r}
+```{r Violen Plot of PMS1 gene expression}
 
 PMS1_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "PMS1"), aes(diagnosis, log2_expression, fill = diagnosis)) +
@@ -428,7 +416,7 @@ ggsave(
 
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
-```{r}
+```{r Violin Plot of ZDHHC17 gene's expression}
 
 ZDHHC17_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
@@ -451,7 +439,7 @@ filename = "~/projects/group04_project/results/ZDHHC17_expression_violin.png",
 )
 ```
 
-For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins. https://www.uniprot.org/uniprotkb/Q8IUH5/entry
+For ZDHHC17, there is a higher gene expression for symptomatic patients compared to control patients. ZDHHC17 is a HTT-interacting protein that plays a key role in palmitoylation of neuronal proteins.
 
 ```{r}
 genesExpression_geompoint <- ggplot(borovecki_grouped |>
@@ -474,7 +462,7 @@ filename = "~/projects/group04_project/results/genesExpression_geompoint.png",
 )
 ```
 
-### ERIC
+### Shiny
 
 We want to get the genes that are more differentially expressed and we will only filter for the significant ones (p-value \< 0.05) and also setting a filter to only select those that are more differentially expressed (estimates \> 1 or estimates \< -1)
 
@@ -495,14 +483,9 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
-### Data Visualization I
+### Data Visualization 
 
-```{r}
-borovecki_data <- borovecki_data |> 
-  mutate(log2_expression = log2(expressionValue))
-```
-
-```{r}
+```{r Boxplot of more expressed gene after log2}
 borovecki_data |>
   filter(gene == "HBA1") |>
   ggplot(aes(x = gene, y = log2_expression)) +
@@ -514,7 +497,7 @@ borovecki_data |>
   )
 ```
 
-```{r}
+```{r Bosplot of less expressed gene after log2}
 borovecki_data |>
   filter(gene == "ZNF675") |>
   ggplot(aes(x = gene, y = log2_expression)) +
@@ -526,15 +509,7 @@ borovecki_data |>
   )
 ```
 
-Repair genes expression level boxplot
-
-### HTT
-
-<https://doi.org/10.1093/braincomms/fcae418>
-
-Huntington's disease is caused by CAG repeat in the HTT gene. Recent genome-wide Association studies (GWASs) have identified genetic modifiers that influence average age of onset in the disease, among the modifiers several genes related to DNA mismatch repair *FAN1*, *LIG1*, *MLH1*, *MSH3*, *PMS1* and *PMS2*,7 which are thought to impact the somatic expansion of the CAG repeat in vulnerable neural cell types.
-
-```{r}
+```{r DNA Repair genes expression level boxplot}
 #| message = FALSE
 dnarepair_genes <- c("PMS1", "FAN1", "LIG1", "MLH1", "MSH3", "PMS2")
 
@@ -565,7 +540,7 @@ ggsave(
              
 ```
 
-```{r}
+```{r Comparison of HBA1 vs ZNF675 Expression }
 genes_compare<-borovecki_data|>
   filter(gene %in% c("ZNF675","HBA1"))
 
@@ -586,7 +561,7 @@ ggplot(genes_wider, aes(x = ZNF675, y = HBA1)) +
 
 ```
 
-```{r}
+```{r Comparison of HTT vs LIG1 Expression}
 genes_relevant0 <- borovecki_data |>
   filter(gene %in% c("HTT", "LIG1"))
 
@@ -605,7 +580,7 @@ ggplot(genes_wide4, aes(x = HTT, y = LIG1)) +
 
 ```
 
-```{r}
+```{r Comparison_of_HTT_vs_MHL1_Expression}
 #| message = FALSE
 genes_relevant1 <- borovecki_data |>
   filter(gene %in% c("HTT", "MLH1"))
@@ -635,7 +610,7 @@ ggsave(
 
 ```
 
-```{r}
+```{r Comparison_of_HTT_vs_PMS1_Expression}
 #| message = FALSE
 genes_Relevant <- borovecki_data |>
   filter(gene %in% c("HTT", "PMS1"))
@@ -672,7 +647,7 @@ The biological relationship between HTT vs MHL1 we can see a similarity with the
 
 Finally the relationship between HTT vs LIG1, this plot is shows a slightly positive trend, as the HTT expression level increases, LIG1 increases slowly. But the slope is weak ans the grey region, the interval, is wide meaning the relationship is weak, this could be due to the HTT expression and how it might influence the this DNA repair gene.
 
-```{r}
+```{r Comparison of HTT vs Repair gene Expression}
 genes_repair <- borovecki_data |>
   filter(gene %in% c("HTT", "PMS1", "FAN1", "LIG1", "MLH1", "MSH3", "PMS2"))
 
@@ -702,4 +677,8 @@ ggplot(genes_long, aes(x = HTT, y = log2_exp)) +
 
 The plot above has all the relevant DNA mismatch repair genes mentioned on the article "Genomic characterization of Huntington’s disease genetic modifiers informs drug target tractability" combined into one single table where the curve summarizes the overall trend across all repair genes and compare them to HTT expression. the plot shows a very slight negative trend. The overall conclusion is that the HTT expression does not strongly influence increasing or decreasing the DNA mismatch repair genes, weak relationship.
 
-After doing the process on ShinyGO, we see no important fold enrichment on this case.
+### Bibliography
+
+Namuli, K. L., Slike, A. N., Hollebeke, M. A., & Wright, G. E. B. (2024). Genomic characterization of Huntington’s disease genetic modifiers informs drug target tractability. *Brain Communications*, *7*(1), fcae418. https://doi.org/10.1093/braincomms/fcae418
+
+Borovecki, F., Lovrecic, L., Zhou, J., Jeong, H., Then, F., Rosas, H. D., Hersch, S. M., Hogarth, P., Bouzou, B., Jensen, R. V., & Krainc, D. (2005). Genome-wide expression profiling of human blood reveals biomarkers for Huntington’s disease. *Proceedings of the National Academy of Sciences*, *102*(31), 11023–11028. https://doi.org/10.1073/pnas.0504921102

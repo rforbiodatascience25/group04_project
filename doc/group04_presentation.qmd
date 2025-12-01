@@ -3,7 +3,6 @@ title: "Group04 Presentation R4BDS"
 author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
 editor: visual
 echo: true
-
 format:
   revealjs:
     css: styles.css
@@ -11,7 +10,11 @@ format:
     background-color: "#CCE6FF"
 ---
 
-## Introduction
+# INTRODUCTION {.slide-title}
+
+------------------------------------------------------------------------
+
+## Introduction {.slide-title2}
 
 <div>
 
@@ -21,15 +24,15 @@ format:
 
 </div>
 
-## Materials and methods
+# MATERIALS AND METHODS {.slide-title}
 
-#### Data Wrangling: From messy to tidy data
+------------------------------------------------------------------------
+
+## Materials and methods {.slide-title2}
+
+### Data Wrangling: From messy to tidy data {.slide-title3}
 
 <br>
-
----
-layout: 2-col
----
 
 ::: column
 <br>
@@ -57,20 +60,16 @@ borovecki <- borovecki |>
 :::
 
 ::: column
-![](images/Borovecki_tibble01.png){fig-align="center" width="339"}
+![](images/Borovecki_tibble01.png){fig-align="center" width="510"}
 
-![](images/Borovecki_tibble_long00.png){fig-align="center" width="323"}
+![](images/Borovecki_tibble_long00.png){fig-align="center" width="480"}
 :::
 
-## Materials and methods
+## Materials and methods {.slide-title2}
 
-#### Data Wrangling: From messy to tidy data
-
-<div>
+### Data Wrangling: From messy to tidy data {.slide-title3}
 
 <br>
-
-</div>
 
 ---
 layout: 2-col
@@ -108,15 +107,11 @@ borovecki_geneLevel <- borovecki |>
 ![](images/Borovecki_tibble-02.png){fig-align="center"}
 :::
 
-## Materials and methods
+## Materials and methods {.slide-title2}
 
-#### Normalization: From raw to standardized data
-
-<div>
+### Normalization: From raw to standardized data {.slide-title3}
 
 <br>
-
-</div>
 
 ---
 layout: 2-col
@@ -153,9 +148,9 @@ raw_histogram + log2_histogram +
 ![](images/comparison1_raw_log2-04.png){fig-align="center"}
 :::
 
-## Materials and methods
+## Materials and methods {.slide-title2}
 
-#### Linear Modelling
+### Linear Modeling {.slide-title3}
 
 <br>
 
@@ -206,9 +201,11 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 ![](images/borovecki_tibble_long_nested_prelm.png){fig-align="center" width="350"}
 :::
 
-## Materials and methods
+## Materials and methods {.slide-title2}
 
-#### Linear Modeling
+### Linear Modeling {.slide-title3}
+
+<div>
 
 <br>
 
@@ -251,29 +248,35 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 ![](images/Borovecki_estimates.png){fig-align="center"}
 :::
 
-## Results
+</div>
 
-#### Dataset exploration in established genetic modifiers
+# RESULTS {.slide-title}
+
+------------------------------------------------------------------------
+
+## Results {.slide-title2}
+
+### Dataset exploration in established genetic modifiers {.slide-title3}
 
 <div>
 
-![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center" width="600"}
+![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-02.png){fig-align="center"}
 
 </div>
 
-## Results
+## Results {.slide-title2}
 
-#### Forest Plot
+### Forest Plot {.slide-title3}
 
 <div>
 
-![](images/forest-02.png){fig-align="center" width="2000"}
+![](images/forest-02.png){fig-align="center" width="2000"} Results
 
 </div>
 
-## Results
+## Results {.slide-title2}
 
-#### Volcano Plot
+### Volcano Plot {.slide-title3}
 
 <div>
 
@@ -281,10 +284,21 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 
 </div>
 
-## Discussion
+# DISCUSSION {.slide-title}
+
+------------------------------------------------------------------------
+
+## Discussion {.slide-title2}
+
+<div>
+
+---
+layout: 2-col
+---
 
 <br>
 
+::: column
 **Bioinformatics** is an **essential** tool in modern biological research.
 
 <br>
@@ -300,3 +314,10 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 <br>
 
 **Collaboration** between scientists and bioinformaticians allows for a better understanding of how **diseases** work
+:::
+
+::: column
+![](images/Flowchart.png){fig-align="center" width="1178"}
+:::
+
+</div>

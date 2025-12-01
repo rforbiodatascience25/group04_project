@@ -3,7 +3,6 @@ title: "Group04 Presentation R4BDS"
 author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
 editor: visual
 echo: true
-embed-resources: true
 format:
   revealjs:
     css: styles.css

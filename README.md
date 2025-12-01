@@ -1,20 +1,51 @@
 # Group 04 Project
 
+### Project Contributors
+
+Sol Escamilla Torres:  Student ID: s253700 // GitHub username: solescamilla
+
+Lucía López Rosales:  Student ID: s253704 // GitHub username: luciarosales03
+
+Diego Medina Castelló:  Student ID: s253699 // GitHub username: dmedinac253699
+
+Beatriz García Remesal: Student ID: s253694 // GitHub username: beatrizgarciarem
+
+Eric Calaveras Ramis: Student ID: s253696 // GitHub username: EricCalaveras
+
 ### Description:
 
-The aim of this project is to use an untidy data set extracted from an article (Borovecki et al. 2005) and do the necessary steps to make it tidy. After that, it will be of interest to use it to find some possible correlations and plot them, so that it is easier to visualize for the people that will be looking at our project.
+The aim of this project is to take an untidy microarray dataset from Borovecki et al. (2005) and perform all the necessary steps to convert it into a tidy format. Once the data is cleaned and organized, we use it to explore potential gene–disease associations through statistical modelling and visualizations. The final goal is to present the results in a clear and accessible way for anyone reviewing our analysis.
+
+### Data Source:
+
+The dataset is downloaded from the public GitHub repository ramhiser/datamicroarray, specifically the file borovecki.RData, retrieved from https://github.com/ramhiser/datamicroarray/tree/master/data.
 
 ### Folders:
 
 In this project the following folders and content can be found:
 
-data/ -\> Original data set used in the article (raw) and tibble showing all the different genes and its expression values for the 31 different samples.
+_raw/ -\> Contains the original dataset used in the article (raw format).
 
-R/ -\> Data processing Quarto document where it is explained step by step how the data has been processed in order to make it tidy and obtain the table (found in data/).
+data/ -\> Stores intermediate and final datasets saved as .rds files, ready to be used for the analysis.
 
-results/ -\> All the correlations and different plots and tibbles that have been found analyzing the data after it has been tidied.
+doc/ -\> Includes Quarto presentation scripts, rendered HTML files, and additional supporting materials.
 
-README.md -\> This file
+R/ -\> Contains Quarto documents that explain, step by step, how the data was processed to obtain a tidy structure. The main steps covered are:
+- Data pre-processing
+- Data tidying
+- Linear modelling
+
+results/ -\> Includes all plots, figures, and correlation analyses generated after tidying and modeling the data.
+
+.gitignore -\> Specifies files and folders that are excluded from version control.
+
+README.md -\> The file you are currently reading.
+
+group04_project.Rproj -\> RStudio project file for easy navigation and reproducibility.
+
+### Presentation link
+
+
 
 ### Contributing:
 
@@ -34,14 +65,4 @@ In order to do so, the user should:
 
 ### Contact:
 
-In case there are any issues with the project, do not hesitate to contact any of the authors of the project via e-mail:
-
-[s253700\@dtu.dk](mailto:s253700@dtu.dk){.email} (Sol Escamilla Torres)
-
-[s2536704\@dtu.dk](mailto:s2536704@dtu.dk){.email} (Lucía López Rosales)
-
-[s253699\@dtu.dk](mailto:s253699@dtu.dk){.email} (Diego Medina Castelló)
-
-[s253694\@dtu.dk](mailto:s253694@dtu.dk){.email} (Beatriz García Remesal)
-
-[s253696\@dtu.dk](mailto:s253696@dtu.dk){.email} (Eric Calaveras Ramis)
+In case there are any issues with the project, do not hesitate to contact any of the authors of the project via e-mail.

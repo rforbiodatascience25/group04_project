@@ -135,7 +135,7 @@ raw_histogram + log2_histogram +
 :::
 
 ::: column
-![](images/comparison1_raw_log2-07.png){fig-align="center"}
+![](images/comparison1_raw_log2-04.png){fig-align="center"}
 :::
 
 ## Materials and methods
@@ -184,7 +184,6 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 :::
 
 ::: column
-
 ![](images/Borovecki_tibble.png){fig-align="center" width="500"}
 
 ![](images/borovecki__tibble_long.png){fig-align="center" width="400"}
@@ -247,26 +246,11 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 layout: 2-col
 ---
 
-::: column
-```{r eval=FALSE}
-geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
-  filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
-  geom_boxplot() +
-  theme_minimal() +
-  labs(
-    title = "Gene expression values in control and symptomatic individuals",
-    x = "Genes",
-    y = "Genes expression"
-  ) +
-  theme(
-    plot.title = element_text(size = 12)) 
+<div>
 
-```
-:::
-
-::: column
 ![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center"}
-:::
+
+</div>
 
 ## Results
 
@@ -278,31 +262,11 @@ geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
 layout: 2-col
 ---
 
-::: column
-```{r eval=FALSE}
-forest <- borovecki_estimates |> 
-  filter(is_significant == "yes") |> 
-  arrange(p.value) |> 
-  slice_head(n = 30) |> 
-  mutate(
-    gene=fct_reorder(gene, estimate)
-  ) |> 
-  ggplot(aes(x=estimate, y=gene))+
-  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high)) +   
-  geom_point() +
-  labs(
-    title = "Genes Associated with hungington disease",
-    x = "Estimates (95%CIs)",
-    y = NULL
-  ) +
-  theme_minimal() 
+<div>
 
-```
-:::
-
-::: column
 ![](images/forest-02.png){fig-align="center"}
-:::
+
+</div>
 
 ## Results
 
@@ -310,26 +274,11 @@ forest <- borovecki_estimates |>
 
 <br>
 
-::: column
-```{r eval=FALSE}
-volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
-  geom_point(aes(color=is_significant, label=lbl), alpha=0.5, size=1) +
-  geom_text_repel(aes(color=is_significant, label = lbl), size = 2, max.overlaps = Inf) +
-  labs(
-    title = "Genes Associated with hungington disease",
-    subtitle = "Genes highlighted in turquoise were significant after multiple testing correction",
-    x = "Estimates",
-    y = "-log10(p)"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none") 
+<div>
 
-```
-:::
-
-::: column
 ![](images/volcano-01.png){fig-align="center"}
-:::
+
+</div>
 
 ## Discussion
 
@@ -339,11 +288,11 @@ volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) +
 
 <br>
 
- [Data wrangling]{.underline}
+[Data wrangling]{.underline}
 
 :   Chaos -\> Biologically interpretable structure
 
- [Statistical analysis + Data visualisation]{.underline}
+[Statistical analysis + Data visualisation]{.underline}
 
 :   Reveal key signals
 

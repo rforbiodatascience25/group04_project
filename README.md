@@ -45,7 +45,7 @@ group04_project.Rproj -\> RStudio project file for easy navigation and reproduci
 
 ### Presentation link
 
-https://teaching.healthtech.dtu.dk/22100/rstudio4/files/projects/group04_project/doc/group04_presentation.html#/title-slide
+https://teaching.healthtech.dtu.dk/22100/rstudio4/files/projects/group04_project/doc/presentation.html#/title-slide
 
 ### Contact:
 

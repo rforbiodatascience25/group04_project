@@ -321,3 +321,11 @@ layout: 2-col
 :::
 
 </div>
+
+## Thank you {.slide-title2}
+
+<div>
+
+![](images/R_Halloween-02.png){fig-align="center"}
+
+</div>

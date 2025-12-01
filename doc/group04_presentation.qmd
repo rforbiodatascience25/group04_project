@@ -55,6 +55,12 @@ borovecki <- borovecki |>
 
 #### Data Wrangling: From messy to tidy data
 
+<div>
+
+<br>
+
+</div>
+
 ---
 layout: 2-col
 ---
@@ -81,9 +87,19 @@ borovecki_geneLevel <- borovecki |>
 ```
 :::
 
+::: column
+![](images/comparison1_raw_log2-06.png){fig-align="center"}
+:::
+
 ## Materials and methods
 
-#### Normalization: From raw to standardize data
+#### Normalization: From raw to standardized data
+
+<div>
+
+<br>
+
+</div>
 
 ---
 layout: 2-col
@@ -115,8 +131,6 @@ raw_histogram + log2_histogram +
   theme(legend.position = "right")
 ```
 :::
-
-![](images/comparison1_raw_log2-05.png){fig-align="center"}
 
 ## Materials and methods
 
@@ -164,6 +178,7 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 :::
 
 ::: column
+
 ![](images/Borovecki_tibble.png){fig-align="center" width="500"}
 
 ![](images/borovecki__tibble_long.png){fig-align="center" width="400"}

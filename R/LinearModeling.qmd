@@ -8,7 +8,7 @@ editor: visual
 
 ## Load libraries
 
-```{r}
+```{r Loading the libraries}
 library(tidyverse)  
 library(modelr)     
 library(splines)   
@@ -18,7 +18,7 @@ library(ggrepel)
 
 ## Load Data
 
-```{r}
+```{r Loading the data}
 #| eval: true
 borovecki_tibble <- readRDS("~/projects/group04_project/data/borovecki_tibble.rds")
 ```
@@ -33,7 +33,7 @@ The `lm()` function uses a wide-data format where:
 
 -   Each cell contains the log2(expressionValue)
 
-```{r}
+```{r Pivoting the data + New binary column}
 borovecki_tibble <- borovecki_tibble |>
   pivot_wider(
     # Columns not to pivot
@@ -63,7 +63,7 @@ PMS1 was identified as a potential modifier gene in Hungington's disease, to stu
 
 -   `Diagnosis = 33.17`: The average change in PMS1 expression when moving from the reference group (0) to the disease group (1).
 
-```{r}
+```{r PMS1 analysis coef}
 my_first_model <- lm(
   PMS1 ~ Diagnosis , 
   data = borovecki_tibble)
@@ -74,7 +74,7 @@ coef(my_first_model)
 
 I can also obtain these values by grouping by Diagnosis to compute the mean value of the gene PMS1
 
-```{r}
+```{r PMS1 analysis results}
 borovecki_tibble |>
   group_by(Diagnosis) |>
   summarize(
@@ -86,7 +86,7 @@ Both calculations show that PMS1 expression is up-regulated in the disease condi
 
 To do so, we compute summary() within the linear model
 
-```{r}
+```{r PMS1 analysis summary}
 summary(my_first_model)
 ```
 
@@ -96,7 +96,7 @@ The gene is up-regulated in patients type 1 (positive slope)and the p-value is 0
 
 The complete analysis requires tidy data, to obtain it we will pivot the wide format
 
-```{r}
+```{r Group analysis: Pivoting the data}
 borovecki_tibble_long <- borovecki_tibble  |> 
   pivot_longer(
     cols = -Diagnosis,
@@ -110,7 +110,7 @@ borovecki_tibble_long <- borovecki_tibble  |>
 
 Next, we will group the tidy data by `gene` and then add the `nest()` and `ungroup()` functions to your pipeline
 
-```{r}
+```{r Group analysis: nesting the data}
 borovecki_tibble_long_nested <- borovecki_tibble_long |> 
   group_by(gene) |> 
   nest() |> 
@@ -125,7 +125,7 @@ It's a tibble that has information of **13,039** genes for 2 variables (Diagnosi
 
 Next, I want to fit a linear model to each gene, to do so, I have to let `R` know that I want to work per gene
 
-```{r}
+```{r Group analysis: Grouping by gene}
 by_gene <- borovecki_tibble_long_nested |> 
   # The tibble is internally being group by the gene, works for certain functions
   # NEST() need groups
@@ -136,7 +136,7 @@ I will now create a function that applies a linear model. Using `map()`, I'll ap
 
 -   The result is a **`<tibble [13,039× 3]>`** where each row is a gene with two nested data frames. The first one contains multiples rows with (diagnosis + log2_expr_level), whereas the second one contains the output of the linear function.
 
-```{r}
+```{r Group analysis: Applying lm}
 # Define lm function
 linear_model <- function(df) {
   lm(
@@ -157,7 +157,7 @@ We will now re-order the results to obtain an understandable format:
 4.  Select columns of interest
 5.  Add a variable q.value that denotes the significancy of a gene
 
-```{r}
+```{r Group analysis: Final format}
 tidy_data <- function(df) {
   df |>
   tidy(conf.int = TRUE,
@@ -178,7 +178,7 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 
 I will create a label for the top 10 potential genes with a formula that combines the estimate and the pvalue (Formula from System Biology class)
 
-```{r}
+```{r Group analysis: Top 10 candidate genes}
 borovecki_estimates <- borovecki_estimates |>
   mutate(
     score_fc = -log10(p.value) * sign(log2(estimate))
@@ -199,13 +199,13 @@ borovecki_estimates <- borovecki_estimates |>
 
 Next, we save the object into our data folder
 
-```{r}
+```{r Group analysis: Saving the results}
 saveRDS(borovecki_estimates, file = "~/projects/group04_project/data/borovecki_estimates.rds")
 ```
 
 Let's now order the significant genes by their estimates and save the results
 
-```{r}
+```{r Group analysis: Saving the ordered results}
 ordered_borovecki <- borovecki_estimates |> 
   filter(is_significant == "yes") |>
   arrange(desc(abs(estimate)))
@@ -217,7 +217,7 @@ Let's see, plot and save the most differentially expressed genes with a forest p
 
 -   The image have been saved with the function ggsave()
 
-```{r}
+```{r Group analysis: Forest plot}
 #| message = FALSE
 forest <- borovecki_estimates |> 
   filter(is_significant == "yes") |> 
@@ -248,7 +248,7 @@ ggsave(
 
 Let's see, plot and save the most deferentially expressed genes with a forest plot
 
-```{r}
+```{r Group analysis: Volcano plot}
 #| message = FALSE
 volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
   geom_point(aes(color=is_significant, label=top10), alpha=0.5, size=1) +

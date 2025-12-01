@@ -483,7 +483,7 @@ genesall <- borovecki_estimates |> pull (gene)
 writeLines(genesall, "genesall.txt")
 ```
 
-### Data Visualization 
+### Data Visualization
 
 ```{r Boxplot of more expressed gene after log2}
 borovecki_data |>

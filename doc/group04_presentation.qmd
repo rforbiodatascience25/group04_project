@@ -7,6 +7,7 @@ echo: true
 format:
   revealjs:
     css: styles.css
+    slide-number: true
     background-color: "#CCE6FF"
 ---
 
@@ -31,6 +32,10 @@ layout: 2-col
 ---
 
 ::: column
+<br>
+
+<br>
+
 ```{r eval=FALSE}
 
 borovecki <- borovecki$x |>
@@ -52,6 +57,9 @@ borovecki <- borovecki |>
 :::
 
 ::: column
+![](images/Borovecki_tibble01.png){fig-align="center" width="339"}
+
+![](images/Borovecki_tibble_long00.png){fig-align="center" width="323"}
 :::
 
 ## Materials and methods
@@ -69,6 +77,10 @@ layout: 2-col
 ---
 
 ::: column
+<br>
+
+<br>
+
 ```{r eval=FALSE}
 
 borovecki <- borovecki |>
@@ -91,6 +103,9 @@ borovecki_geneLevel <- borovecki |>
 :::
 
 ::: column
+![](images/Borovecki_mapsid.png){fig-align="center"}
+
+![](images/Borovecki_tibble-02.png){fig-align="center"}
 :::
 
 ## Materials and methods
@@ -188,7 +203,7 @@ borovecki_tibble_long_nested <- borovecki_tibble_long |>
 
 ![](images/borovecki__tibble_long.png){fig-align="center" width="400"}
 
-![](images/borovecki_tibble_long_nested_prelm.png){fig-align="center" width="300"}
+![](images/borovecki_tibble_long_nested_prelm.png){fig-align="center" width="350"}
 :::
 
 ## Materials and methods
@@ -233,22 +248,16 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 ::: column
 ![](images/borovecki_tibble_long_nested.png){fig-align="right"}
 
-![](images/borovecki_estimate.png){fig-align="right"}
+![](images/Borovecki_estimates.png){fig-align="center"}
 :::
 
 ## Results
 
 #### Dataset exploration in established genetic modifiers
 
-<br>
-
----
-layout: 2-col
----
-
 <div>
 
-![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center"}
+![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center" width="600"}
 
 </div>
 
@@ -256,15 +265,9 @@ layout: 2-col
 
 #### Forest Plot
 
-<br>
-
----
-layout: 2-col
----
-
 <div>
 
-![](images/forest-02.png){fig-align="center"}
+![](images/forest-02.png){fig-align="center" width="2000"}
 
 </div>
 
@@ -272,11 +275,9 @@ layout: 2-col
 
 #### Volcano Plot
 
-<br>
-
 <div>
 
-![](images/volcano-01.png){fig-align="center"}
+![](images/volcano-03.png){fig-align="center" width="1200"}
 
 </div>
 

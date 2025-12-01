@@ -3,6 +3,7 @@ title: "Group04 Presentation R4BDS"
 author: "Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina"
 editor: visual
 echo: true
+embed-resources: true
 format:
   revealjs:
     css: styles.css
@@ -298,27 +299,19 @@ layout: 2-col
 
 <br>
 
-::: column
+<div>
+
 **Bioinformatics** is an **essential** tool in modern biological research.
 
-<br>
+:   <br>
 
-[Data wrangling]{.underline}
+    ![](images/¨Workflow-01.png){width="610"}
 
-:   Chaos -\> Biologically interpretable structure
-
-[Statistical analysis + Data visualisation]{.underline}
-
-:   Reveal key signals
-
-<br>
+:   <br>
 
 **Collaboration** between scientists and bioinformaticians allows for a better understanding of how **diseases** work
-:::
 
-::: column
-![](images/¨Workflow.png){fig-align="center"}
-:::
+</div>
 
 </div>
 

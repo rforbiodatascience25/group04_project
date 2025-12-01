@@ -184,7 +184,7 @@ borovecki_tibble_long <- borovecki_tibble  |>
     values_to = "log2_expr_level"
   ) |>
   mutate(
-    log2_expr_level = log2(log2_expr_level)
+    log2_expr_level = log2(log2_expr_level) 
   )
 borovecki_tibble_long_nested <- borovecki_tibble_long |> 
   group_by(gene) |> 

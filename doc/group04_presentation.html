@@ -563,7 +563,7 @@ Eric Calaveras - Sol Escamilla - Beatriz García - Lucía López - Diego Medina
 <span id="cb4-22"><a href=""></a>    <span class="at">values_to =</span> <span class="st">"log2_expr_level"</span></span>
 <span id="cb4-23"><a href=""></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb4-24"><a href=""></a>  <span class="fu">mutate</span>(</span>
-<span id="cb4-25"><a href=""></a>    <span class="at">log2_expr_level =</span> <span class="fu">log2</span>(log2_expr_level)</span>
+<span id="cb4-25"><a href=""></a>    <span class="at">log2_expr_level =</span> <span class="fu">log2</span>(log2_expr_level) </span>
 <span id="cb4-26"><a href=""></a>  )</span>
 <span id="cb4-27"><a href=""></a>borovecki_tibble_long_nested <span class="ot">&lt;-</span> borovecki_tibble_long <span class="sc">|&gt;</span> </span>
 <span id="cb4-28"><a href=""></a>  <span class="fu">group_by</span>(gene) <span class="sc">|&gt;</span> </span>

@@ -80,7 +80,7 @@ To address this, we apply a log2 transformation to the expression values. This t
 
 After applying the log2 transformation, it is normal to obtain negative values, which correspond to expression values between 0 and 1 in the original scale. These negative values do not indicate “negative expression,” but rather reflect very low levels of expression.
 
-```{rData transformation}
+```{r Data transformation}
 borovecki_data <- borovecki_tibble |> 
   mutate(log2_expression = log2(expressionValue))
 ```
@@ -351,7 +351,7 @@ geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
   ) +
   theme(
     plot.title = element_text(size = 12)) 
-
+geneExpression_comparison_boxplot
 ggsave(
   filename = "~/projects/group04_project/results/geneExpression_comparison_boxplot.png",
   plot = geneExpression_comparison_boxplot,
@@ -416,7 +416,7 @@ ggsave(
 
 For PMS1, symptomatic patients show a higher expression level compared to controls.
 
-```{r Violin Plot of ZDHHC17 gene's expression}
+```{r Violin Plot of ZDHHC17 genes expression}
 
 ZDHHC17_expression_violin <- ggplot(borovecki_grouped |>
 filter(gene == "ZDHHC17"), aes(diagnosis, log2_expression, fill = diagnosis)) +
@@ -453,7 +453,7 @@ genesExpression_geompoint <- ggplot(borovecki_grouped |>
   ) +
   theme(
     plot.title = element_text(size = 10))
-
+genesExpression_geompoint
 ggsave(
 filename = "~/projects/group04_project/results/genesExpression_geompoint.png",
   plot = genesExpression_geompoint,
@@ -527,10 +527,9 @@ Expression_of_DNA_repair_genes_vs_clinical_outcome <- ggplot(dnarepair_data, aes
     title = "Expression of DNA repair genes vs clinical outcome",
     caption="Data from: Borovecki et al. 2005"
   ) +
-  theme_minimal() +
-  theme(legend.position = "right ")
+  theme_minimal() 
 
-
+Expression_of_DNA_repair_genes_vs_clinical_outcome
 ggsave(
   filename = "~/projects/group04_project/results/Expression_of_DNA_repair_genes_vs_clinical_outcome.png",
   plot = Expression_of_DNA_repair_genes_vs_clinical_outcome,

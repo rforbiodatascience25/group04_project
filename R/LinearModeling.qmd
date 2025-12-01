@@ -240,7 +240,7 @@ forest
 
 ggsave(
   filename = "~/projects/group04_project/results/forest.png", 
-  plot = top30,                                     
+  plot = forest,                                     
   device = "png",                               
   dpi = 300   # Resolution
 )
@@ -251,8 +251,8 @@ Let's see, plot and save the most deferentially expressed genes with a forest pl
 ```{r}
 #| message = FALSE
 volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
-  geom_point(aes(color=is_significant, label=lbl), alpha=0.5, size=1) +
-  geom_text_repel(aes(color=is_significant, label = lbl), size = 2, max.overlaps = Inf) +
+  geom_point(aes(color=is_significant, label=top10), alpha=0.5, size=1) +
+  geom_text_repel(aes(color=is_significant, label = top10), size = 3, max.overlaps = Inf) +
   labs(
     title = "Genes Associated with hungington disease",
     subtitle = "Genes highlighted in turquoise were significant after multiple testing correction",
@@ -266,7 +266,7 @@ volcano
 
 ggsave(
   filename = "~/projects/group04_project/results/volcano.png", 
-  plot = top30,                                     
+  plot = volcano,                                     
   device = "png",                               
   dpi = 300   # Resolution
 )

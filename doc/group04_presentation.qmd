@@ -260,7 +260,7 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 
 <div>
 
-![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-02.png){fig-align="center"}
+![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-03.png){fig-align="center"}
 
 </div>
 

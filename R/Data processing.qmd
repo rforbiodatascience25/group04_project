@@ -525,7 +525,7 @@ Expression_of_DNA_repair_genes_vs_clinical_outcome <- ggplot(dnarepair_data, aes
     x = "Expression level",
     y = "Genes",
     title = "Expression of DNA repair genes vs clinical outcome",
-    caption="Data from: Borovecki et al. 2005"
+    caption="Data from: Borovecki et al. 2005\nData from: Namuli et al. 2024"
   ) +
   theme_minimal() 
 

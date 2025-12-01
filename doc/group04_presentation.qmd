@@ -10,8 +10,6 @@ format:
     background-color: "#CCE6FF"
 ---
 
-
-
 ## Introduction
 
 <div>
@@ -86,6 +84,37 @@ borovecki_geneLevel <- borovecki |>
 ## Materials and methods
 
 #### Normalization: From raw to standardize data
+
+---
+layout: 2-col
+---
+
+::: column
+```{r eval=FALSE}
+raw_histogram <- ggplot(borovecki_data, aes(x = expressionValue,fill = "Raw data")) +
+  geom_histogram(bins = 50, alpha = 0.6) +
+  fill_scale+
+  theme_minimal(base_size = 14) +
+  labs(x = "Expression value",
+       y = "Count") +
+  theme(plot.title = element_text(size = 13, 
+                                  hjust = 0.5)) 
+
+log2_histogram <- ggplot(borovecki_data, aes(x = log2_expression,  fill = "Log2 data")) +
+  geom_histogram(bins = 100, alpha = 0.6) +
+  fill_scale +
+  theme_minimal(base_size = 14) +
+  labs(x = "log2(Expression value)",
+       y = "Count") +
+  theme(plot.title = element_text(size = 13,
+                                  hjust = 0.5))
+raw_histogram + log2_histogram + 
+  plot_layout(guides = "collect")+
+  plot_annotation(title="Comparison between Raw and Log2-Transformed Expression Data", 
+                  caption="Data from: Borovecki et al. 2005") &
+  theme(legend.position = "right")
+```
+:::
 
 ![](images/comparison1_raw_log2-05.png){fig-align="center"}
 
@@ -200,8 +229,8 @@ borovecki_estimates <- borovecki_tibble_long_nested |>
 ---
 layout: 2-col
 ---
-::: {.column}
 
+::: column
 ```{r eval=FALSE}
 geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
   filter(gene %in% c("HTT","FAN1", "LIG1", "MLH1", "MSH3", "PMS1", "PMS2")), aes(gene, log2_expression, fill = diagnosis)) +
@@ -217,9 +246,11 @@ geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
 
 ```
 :::
-::: {.column}
+
+::: column
 ![](images/Expression_of_DNA_repair_genes_vs_clinical_outcome-01.png){fig-align="center"}
 :::
+
 ## Results
 
 #### Forest Plot
@@ -230,8 +261,7 @@ geneExpression_comparison_boxplot <- ggplot(borovecki_grouped |>
 layout: 2-col
 ---
 
-::: {.column}
-
+::: column
 ```{r eval=FALSE}
 forest <- borovecki_estimates |> 
   filter(is_significant == "yes") |> 
@@ -251,24 +281,19 @@ forest <- borovecki_estimates |>
   theme_minimal() 
 
 ```
-
-
 :::
-::: {.column}
 
+::: column
 ![](images/forest-02.png){fig-align="center"}
-
 :::
 
 ## Results
 
 #### Volcano Plot
 
-<br>
----
-layout: 2-col
----
-::: {.column}
+<br> 31b8e172-b470-440e-83d8-e6b185028602:dAB5AHAAZQA6AFoAUQBBAHgAQQBEAGcAQQBNAFEAQQA1AEEARABZAEEATQBBAEEAMQBBAEMAMABBAE0AQQBCAGgAQQBHAE0AQQBaAEEAQQB0AEEARABRAEEAWgBnAEIAaABBAEcAVQBBAEwAUQBBADQAQQBHAEkAQQBPAFEAQQA1AEEAQwAwAEEATwBRAEIAagBBAEQARQBBAFkAZwBBADMAQQBHAEkAQQBaAEEAQQAzAEEARwBNAEEATQBBAEIAbQBBAEQARQBBAAoAcABvAHMAaQB0AGkAbwBuADoATgBBAEEANABBAEQAWQBBAE4AUQBBAD0ACgBwAHIAZQBmAGkAeAA6AAoAcwBvAHUAcgBjAGUAOgBMAFEAQQB0AEEAQwAwAEEAQwBnAEIAcwBBAEcARQBBAGUAUQBCAHYAQQBIAFUAQQBkAEEAQQA2AEEAQwBBAEEATQBnAEEAdABBAEcATQBBAGIAdwBCAHMAQQBBAG8AQQBMAFEAQQB0AEEAQwAwAEEACgBzAHUAZgBmAGkAeAA6AA==:31b8e172-b470-440e-83d8-e6b185028602
+
+::: column
 ```{r eval=FALSE}
 volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) + 
   geom_point(aes(color=is_significant, label=lbl), alpha=0.5, size=1) +
@@ -285,9 +310,7 @@ volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) +
 ```
 :::
 
-::: {.column}
-
-
+::: column
 ![](images/volcano-01.png){fig-align="center"}
 :::
 
@@ -295,32 +318,24 @@ volcano <- ggplot(borovecki_estimates, aes(x = estimate, y = -log10(p.value))) +
 
 <br>
 
-<<<<<<< HEAD
 **Bioinformatics** is an **essential** tool in modern biological research.
 
 <br>
 
 [Data wrangling]{.underline}
 
-: Chaos -> Biologically interpretable structure
+:   Chaos -\> Biologically interpretable structure
 
 [Statistical analysis + Data visualisation]{.underline}
 
-: Reveal key signals
+:   Reveal key signals
 
 <br>
 
-=======
 **Bioinformatics** is an essential tool in modern biological research
 
-<br>
-* Data wrangling
-    * Chaos $\rightarrow$ Biologically interpretable structure
-<br>
-* Statistical analysis + Data visualisation
-    * Reveal key signals
+<br> \* Data wrangling \* Chaos $\rightarrow$ Biologically interpretable structure <br> \* Statistical analysis + Data visualisation \* Reveal key signals
 
 <br>
 
->>>>>>> d7a2c6ac43d347d6ef9f97d92ed516cc3e82415d
 **Collaboration** between scientists and bioinformaticians allows for a better understanding of how **diseases** work
